@@ -1,0 +1,9 @@
+flowchart LR
+    LOGIN[Login / AdminTenantSelectorDialog] -->|restaurantId| TC[TenantContext<br/>canonicalId, read, save]
+    TC --> PREFS[(SecurePreferencesHelper<br/>getPrinterPrefs: restaurant_id, current_tenant)]
+    TC --> ADB[AppDatabase.getDatabaseForTenant]
+    ADB --> MAP{{TENANT_INSTANCES<br/>mapa de instancias Room}}
+    MAP --> DB1[(softmyc_database.db<br/>lanube)]
+    MAP --> DB2[(softmyc_negocio.db<br/>resto de negocios)]
+    ADB -->|al crear la instancia| SEED[TenantCatalogSeeder<br/>segundo plano]
+    TC -. sin negocio válido .-> EX[NoActiveTenantException<br/>BaseActivity vuelve al login]

@@ -1,0 +1,22 @@
+erDiagram
+    ProductoLocal {
+        int codigo PK
+        string nombre
+        double precio
+        string categoria
+        list ingredientes
+        string unidadMedida
+        int stock "-1 = sin control"
+    }
+    ExtraLocal { string nombre PK
+        double precio }
+    SalsaLocal { string nombre PK }
+    VentaLocal {
+        int id PK
+        long fecha
+        double total
+        string itemsJson
+        boolean isSynced
+        string metodoPago
+        string uuid "añadido en la migración 5 a 6"
+    }

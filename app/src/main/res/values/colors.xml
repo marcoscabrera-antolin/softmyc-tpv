@@ -1,0 +1,44 @@
+<resources>
+    <!-- Dark Slate Palette -->
+    <color name="background_dark">#0F172A</color>
+    <color name="surface_dark">#1E293B</color>
+    <color name="surface_light">#334155</color>
+    
+    <!-- Brand Colors -->
+    <color name="primary_brand">#3B82F6</color> <!-- Electric Blue -->
+    <color name="primary_variant">#2563EB</color>
+    <color name="secondary_brand">#10B981</color> <!-- Emerald -->
+    
+    <!-- Accents -->
+    <color name="accent_amber">#F59E0B</color>
+    <color name="accent_rose">#F43F5E</color>
+    <color name="accent_purple">#8B5CF6</color>
+    <color name="accent_pink">#EC4899</color>
+    <color name="accent_slate">#64748B</color>
+    <color name="accent_sky">#38BDF8</color>
+    <color name="accent_green">#4ADE80</color>
+    <!-- Translucent Colors (15% opacity for backgrounds) -->
+    <color name="translucent_blue">#263B82F6</color>
+    <color name="translucent_amber">#26F59E0B</color>
+    <color name="translucent_emerald">#2610B981</color>
+    <color name="translucent_purple">#268B5CF6</color>
+    <color name="translucent_pink">#26EC4899</color>
+    <color name="translucent_slate">#2664748B</color>
+    
+    <!-- Text -->
+    <color name="text_primary">#F8FAFC</color>
+    <color name="text_secondary">#94A3B8</color>
+    
+    <!-- Legacy Mappings (to avoid breaking other layouts immediately) -->
+    <color name="purple_200">@color/primary_brand</color>
+    <color name="purple_500">@color/primary_variant</color>
+    <color name="purple_700">@color/background_dark</color>
+    <color name="teal_200">@color/secondary_brand</color>
+    <color name="teal_700">@color/secondary_brand</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="stock_ok">#22C55E</color>
+    <color name="stock_low">#F59E0B</color>
+    <color name="stock_out">#EF4444</color>
+    <color name="stock_untracked">#64748B</color>
+</resources>

@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F172A"
+    android:orientation="horizontal"
+    android:baselineAligned="false"
+    android:weightSum="2.4"
+    android:fitsSystemWindows="true">
+
+    <!-- ================================================= -->
+    <!--  COLUMNA 1: CATÁLOGO Y CATEGORÍAS (70% ANCHO)     -->
+    <!-- ================================================= -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1.68"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- CABECERA DE NAVEGACIÓN -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="14dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="#F8FAFC"
+                android:contentDescription="@string/volver_al_dashboard"
+                android:layout_marginEnd="8dp" />
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_logo_monogram"
+                android:scaleType="fitCenter"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:id="@+id/tituloPedido"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/hacer_pedido"
+                android:textColor="#F8FAFC"
+                android:textSize="26sp"
+                android:textStyle="bold"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRecuperarPedido"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/recuperar"
+                android:textSize="14sp"
+                android:textColor="#3B82F6"
+                app:icon="@android:drawable/ic_menu_rotate"
+                app:iconTint="#3B82F6"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVaciarPedido"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/vaciar"
+                android:textSize="14sp"
+                android:textColor="#F87171"/>
+        </LinearLayout>
+
+        <!-- BUSCADOR / ID RÁPIDO -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#1E293B">
+
+            <LinearLayout
+                android:id="@+id/btnIntroducirID"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="18dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground">
+                
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@android:drawable/ic_menu_search"
+                    android:importantForAccessibility="no"
+                    app:tint="#64748B"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="14dp">
+                    <TextView
+                        android:id="@+id/txtTituloID"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/buscar_o_introducir_id_rapido"
+                        android:textColor="#E2E8F0"
+                        android:textSize="16sp"
+                        android:textStyle="bold"/>
+                     <TextView
+                        android:id="@+id/txtProductoSeleccionado"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="#94A3B8"
+                        android:textSize="13sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:visibility="gone"/>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- CHIPS HORIZONTALES DE CATEGORÍAS -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerCategorias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:orientation="horizontal"
+            android:scrollbars="none"
+            android:clipToPadding="false"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <!-- PARRILLA DE PRODUCTOS EN GRID CON SCROLL INDEPENDIENTE -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerProductosGrid"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="vertical"
+            android:clipToPadding="false"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="4" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="#1E293B" />
+
+    <!-- ================================================= -->
+    <!--  COLUMNA 2: RESUMEN / TICKET EN CURSO (30% ANCHO) -->
+    <!-- ================================================= -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.72"
+        android:orientation="vertical"
+        android:background="#0B1120"
+        android:padding="20dp">
+        
+        <!-- ESTADO / NOTA DE HORA -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="10dp"
+            app:cardBackgroundColor="#1E293B"
+            app:cardElevation="0dp">
+             <TextView
+                android:id="@+id/txtHoraRecogida"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="14dp"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#F59E0B"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                tools:text="📝 Nota: Sin cebolla"/>
+         </com.google.android.material.card.MaterialCardView>
+
+        <!-- LISTA DEL TICKET CON SCROLL INDEPENDIENTE -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#0F172A"
+            app:strokeColor="#1E293B"
+            app:strokeWidth="1dp"
+            app:cardElevation="0dp">
+            <ListView
+                android:id="@+id/listaPedido"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="#1E293B"
+                android:dividerHeight="1dp"
+                android:padding="8dp"
+                android:clipToPadding="false"/>
+         </com.google.android.material.card.MaterialCardView>
+
+        <!-- TOTAL Y ACCIONES INFERIORES -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp">
+
+            <!-- TOTAL -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="bottom"
+                android:layout_marginBottom="16dp">
+                 <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/total"
+                    android:textSize="18sp"
+                    android:textColor="#64748B"
+                    android:paddingBottom="6dp"/>
+                <TextView
+                    android:id="@+id/textoTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0.00€"
+                    android:textSize="36sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"/>
+            </LinearLayout>
+
+            <!-- ACCIONES IMPRIMIR Y HORA -->
+             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="horizontal">
+
+                 <!-- BOTÓN HORA / NOTA -->
+                 <com.google.android.material.card.MaterialCardView
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="12dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardBackgroundColor="#1E293B"
+                    app:strokeColor="#334155"
+                    app:strokeWidth="1dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:id="@+id/btnHora"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                         <ImageView
+                            android:id="@+id/txtTituloHora"
+                            android:contentDescription="@string/cd_hora_recogida"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_clock"
+                            app:tint="#fff"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- BOTÓN IMPRIMIR -->
+                 <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="14dp"
+                    app:cardBackgroundColor="#2563EB"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:id="@+id/btnImprimir"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        
+                        <TextView 
+                            android:id="@+id/txtTituloImprimir" 
+                            android:layout_width="wrap_content" 
+                            android:layout_height="wrap_content" 
+                            android:text="@string/imprimir_pedido" 
+                            android:textColor="#FFF" 
+                            android:textStyle="bold" 
+                            android:letterSpacing="0.05"
+                            android:textSize="17sp"/>
+                        <TextView android:id="@+id/txtImprimirInfo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+             </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

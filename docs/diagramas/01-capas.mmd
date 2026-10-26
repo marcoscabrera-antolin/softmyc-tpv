@@ -1,0 +1,29 @@
+flowchart TB
+    subgraph presentation["presentation (Activities, adapters, viewmodel/)"]
+        PA[PedidoActivity]
+        PWA[PedidosWebActivity]
+        LA[LoginActivity]
+        VMP[PedidoViewModel]
+        VML[LoginViewModel]
+    end
+    subgraph domain["domain (modelos, use cases, pricing, puertos)"]
+        UC[ImprimirYGuardarVentaUseCase<br/>CalcularTotalUseCase]
+        PRC[pricing/PricingStrategy*]
+        PORT[port/: VentaStore, TicketPrinter,<br/>TicketComposer, ItemsSerializer, PrinterSettings]
+        REPO[repository/: ProductoRepository,<br/>VentaRepository, CatalogoTenantRepository]
+    end
+    subgraph data["data (Room, red, impresora, sync)"]
+        ROOM[local/AppDatabase + DAOs]
+        REPOIMPL[repo/*Room, *Android, *Prefs]
+        NET[network/OrderSyncService]
+        AUTH[auth/Auth, SessionManager]
+        SYNC[sync/SyncManager, VentaUploader]
+        PRN[printer/PrinterHelper]
+    end
+    presentation --> domain
+    presentation --> data
+    data -. implementa .-> PORT
+    data -. implementa .-> REPO
+    REPOIMPL --> ROOM
+    SYNC --> NET
+    NET --> AUTH

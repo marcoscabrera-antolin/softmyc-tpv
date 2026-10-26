@@ -1,0 +1,40 @@
+erDiagram
+    tenants ||--o{ productos : "tenant_id"
+    tenants ||--o{ extras : "tenant_id"
+    tenants ||--o{ salsas : "tenant_id"
+    tenants ||--o{ ventas : "tenant_id"
+    tenants ||--o{ usuario_negocios : "tenant_id"
+    usuarios ||--o{ usuario_negocios : "usuario_id"
+    usuarios ||--o{ sesiones : "usuario_id"
+    tenants ||--o{ sesiones : "tenant_id"
+    sesiones ||--o| sesiones : "reemplazada_por"
+    ventas ||..o{ ventas_historial : "venta_id (sin FK; lo escribe un disparador)"
+    tenants { text id PK
+        text nombre
+        text sector
+        boolean activo }
+    productos { text tenant_id PK
+        int codigo PK
+        numeric precio
+        int stock }
+    ventas { bigint id PK
+        text tenant_id
+        bigint id_local "UNIQUE con tenant_id y fecha"
+        uuid uuid "idempotencia de la subida"
+        timestamptz fecha
+        numeric total
+        jsonb items
+        text metodo_pago }
+    usuarios { bigint id PK
+        text username UK
+        text password_hash "scrypt"
+        boolean es_admin
+        int intentos_fallidos }
+    usuario_negocios { bigint usuario_id PK
+        text tenant_id PK
+        text rol "admin, encargado, tpv_operator" }
+    sesiones { uuid id PK
+        uuid familia
+        bytea access_hash UK
+        bytea refresh_hash UK
+        timestamptz revocada_en }

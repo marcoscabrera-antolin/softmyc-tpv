@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="4dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="top">
+
+    <TextView
+        android:id="@+id/textoPedido"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="#E2E8F0"
+        android:textSize="14sp"
+        android:lineSpacingExtra="3dp"
+        android:text="Producto Ejemplo"/>
+
+    <TextView
+        android:id="@+id/textoTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0.00€"
+        android:textColor="#FFF"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:paddingStart="8dp"/>
+</LinearLayout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp"
+    app:cardBackgroundColor="#1E293B"
+    app:cardElevation="2dp"
+    app:strokeColor="#334155"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp">
+
+        <!-- POSITION / MEDAL (Plain element, no nested card) -->
+        <TextView
+            android:id="@+id/txtPosicion"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            tools:text="10"
+            android:textColor="#38BDF8"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:padding="0dp"
+            android:includeFontPadding="false"
+            android:background="@drawable/fondo_circle_badge"
+            android:backgroundTint="#0F172A"/>
+
+        <!-- PRODUCT INFO (Layout weight matches the horizontal space) -->
+        <TextView
+            android:id="@+id/txtNombreProducto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:text="Hamburguesa Completa"
+            android:textColor="#F8FAFC"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:ellipsize="end"
+            android:layout_marginHorizontal="16dp"
+            android:maxLines="1"/>
+
+        <!-- SALES BADGE (Unified rounded badge, no nested card) -->
+        <TextView
+            android:id="@+id/txtVentas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:gravity="center"
+            tools:text="45 uds"
+            android:textColor="#C7D2FE"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:background="@drawable/fondo_boton_redondo"
+            android:backgroundTint="#3730A3"/>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph legado["Modelo heredado (hostelería)"]
+        P[Producto] --> PI[PedidoItem / CustomizedOrderItem]
+        IO[IngredientOption]
+        CT[CalcularTotalUseCase]
+    end
+    subgraph universal["Modelo agnóstico (Fase 2)"]
+        CI[CatalogItem] --> UOI[UniversalOrderItem]
+        IM[ItemModifier] --> UOI
+        UO[UniversalOrder]
+        PSF[PricingStrategyFactory] --> S1[StandardUnit]
+        PSF --> S2[Weight]
+        PSF --> S3[Time]
+        PSF --> S4[TieredVolume]
+        CUT[CalculateUniversalTotalUseCase]
+    end
+    LOA[LegacyOrderAdapter] -->|convierte| P
+    LOA -->|a| CI
+    LOA -->|a| IM
+    PI --> CT
+    UOI --> CUT --> PSF

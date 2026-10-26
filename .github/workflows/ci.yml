@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android (tests JVM y build release)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Preparar SDK de Android (plataforma 35)
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ -x "$SDKMANAGER" ]; then
+            yes | "$SDKMANAGER" --licenses > /dev/null || true
+            "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+          else
+            echo "sdkmanager no disponible en el runner; se usa el SDK preinstalado"
+          fi
+
+      - name: Tests unitarios y build release
+        run: ./gradlew testDebugUnitTest assembleRelease --no-daemon --stacktrace
+
+      - name: Informe de cobertura JaCoCo
+        run: ./gradlew jacocoDebugUnitTestReport --no-daemon
+
+      - name: Puerta de cobertura (líneas ≥ 80 %)
+        run: ./gradlew jacocoDebugUnitTestCoverageVerification --no-daemon
+
+      - name: Publicar resultados de tests y cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-reports
+          path: |
+            app/build/test-results/testDebugUnitTest/
+            app/build/reports/jacoco/jacocoDebugUnitTestReport/
+          if-no-files-found: ignore
+
+  api:
+    name: API y base de datos (PostgreSQL 16)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: tfg_softmyc_tpv
+          POSTGRES_USER: tfg_owner
+          POSTGRES_PASSWORD: ci_owner_password
+          TFG_APP_PASSWORD: ci_app_password
+          TFG_AUTH_PASSWORD: ci_auth_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tfg_owner -d tfg_softmyc_tpv"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      CI: 'true'
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: tfg_owner
+      PGPASSWORD: ci_owner_password
+      PGDATABASE: tfg_softmyc_tpv
+      TFG_APP_PASSWORD: ci_app_password
+      TFG_AUTH_PASSWORD: ci_auth_password
+      TEST_OWNER_URL: postgres://tfg_owner:ci_owner_password@localhost:5432/tfg_softmyc_tpv
+      TEST_APP_URL: postgres://tfg_app:ci_app_password@localhost:5432/tfg_softmyc_tpv
+      TEST_AUTH_URL: postgres://tfg_auth:ci_auth_password@localhost:5432/tfg_softmyc_tpv
+    defaults:
+      run:
+        working-directory: tfg-db
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tfg-db/api/package-lock.json
+
+      - name: Aplicar initdb/ (mismo orden que el entrypoint de Docker)
+        run: |
+          # 01-roles.sh usa POSTGRES_USER/POSTGRES_DB y las contraseñas de los roles de la app
+          export POSTGRES_USER="$PGUSER" POSTGRES_DB="$PGDATABASE"
+          for f in initdb/*; do
+            case "$f" in
+              *.sh) sh "$f" ;;
+              *.sql) psql -v ON_ERROR_STOP=1 -U "$PGUSER" -d "$PGDATABASE" -f "$f" ;;
+            esac
+          done
+        env:
+          PGPASSWORD: ci_owner_password
+
+      - name: Instalar dependencias de la API
+        working-directory: tfg-db/api
+        run: npm ci
+
+      - name: Tests de la API (incluye tests de base de datos; CI=true impide omitirlos)
+        working-directory: tfg-db/api
+        run: npm test

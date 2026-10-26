@@ -1,0 +1,98 @@
+# Base de datos del TFG SoftMYC: PostgreSQL 16 aislada de la base de producción (softmyc-postgres).
+# Contenedor, volumen, red y puerto propios; solo escucha en loopback.
+name: tfg-softmyc-db
+
+services:
+  tfg-postgres:
+    image: postgres:16-alpine
+    container_name: tfg-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${TFG_DB_NAME}
+      POSTGRES_USER: ${TFG_OWNER_USER}
+      POSTGRES_PASSWORD: ${TFG_OWNER_PASSWORD:?define TFG_OWNER_PASSWORD en .env}
+      TFG_APP_PASSWORD: ${TFG_APP_PASSWORD:?define TFG_APP_PASSWORD en .env}
+      TFG_AUTH_PASSWORD: ${TFG_AUTH_PASSWORD:-}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --encoding=UTF8 --locale=C.UTF-8"
+      TZ: Europe/Madrid
+    ports:
+      - "127.0.0.1:${TFG_DB_PORT:-5433}:5432"
+    volumes:
+      - tfg_postgres_data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    networks: [tfg_net]
+    command: >
+      postgres
+      -c shared_buffers=128MB
+      -c effective_cache_size=384MB
+      -c max_connections=30
+      -c log_min_duration_statement=500
+      -c password_encryption=scram-sha-256
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    mem_limit: 512m
+    cpus: "1.0"
+    pids_limit: 200
+    security_opt: ["no-new-privileges:true"]
+    # Sistema de ficheros de solo lectura: Postgres solo escribe en el volumen de datos, /tmp y el socket.
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+    # Sin capacidades salvo las que usa el entrypoint de la imagen para preparar PGDATA y bajar a usuario postgres.
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+    # Rotación de logs: log_min_duration_statement=500 podría llenar el disco del VPS compartido.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  tfg-api:
+    build: ./api
+    image: tfg-softmyc-api:1.0.0
+    container_name: tfg-api
+    restart: unless-stopped
+    depends_on:
+      tfg-postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "3100"
+      DATABASE_URL: postgres://tfg_app:${TFG_APP_PASSWORD}@tfg-postgres:5432/${TFG_DB_NAME}
+      # Segunda conexión, con el rol tfg_auth: única que puede ejecutar login, refresco y sesiones.
+      AUTH_DATABASE_URL: postgres://tfg_auth:${TFG_AUTH_PASSWORD:?define TFG_AUTH_PASSWORD en .env}@tfg-postgres:5432/${TFG_DB_NAME}
+      # Transición: mientras sea true, x-api-key sigue autenticando (rol operador, sin stock ni administración).
+      ALLOW_API_KEY_AUTH: ${ALLOW_API_KEY_AUTH:-false}
+      ACCESS_TTL_MIN: "30"
+      REFRESH_TTL_DAYS: "7"
+    # Sin puertos publicados. Solo entra la red tfg_edge, que comparten esta API y el nginx de softmyc
+    # (no la red softmyc_softmyc-net completa, donde están los contenedores de producción).
+    networks: [tfg_net, tfg_edge]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 256m
+    pids_limit: 100
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+volumes:
+  tfg_postgres_data:
+    name: tfg_postgres_data
+
+networks:
+  tfg_net:
+    name: tfg_net
+  # Creada a mano antes del primer despliegue (docker network create tfg_edge); ver README, "Aislamiento de red".
+  tfg_edge:
+    name: tfg_edge
+    external: true

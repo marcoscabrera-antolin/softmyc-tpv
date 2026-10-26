@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant UI as Activity / ViewModel
+    participant A as Auth (fachada)
+    participant SM as SessionManager
+    participant HTTP as OkHttp (AuthInterceptor + TokenAuthenticator)
+    participant API as API Node (/api/tpv)
+    participant J as SyncJobService (JobScheduler)
+    participant VU as VentaUploader
+    participant G as SyncGuard
+
+    UI->>A: login(usuario, clave)
+    A->>API: POST /api/tpv/auth/login
+    API-->>A: access + refresh (hash en BD)
+    A->>SM: SessionStore.save (EncryptedSharedPreferences)
+    J->>VU: subirPendientes()
+    VU->>G: canUploadFor(sesión, negocio local)
+    alt negocio de la base local ≠ negocio de la sesión
+        G-->>VU: no (SESION_OTRO_NEGOCIO)
+    else mismo negocio
+        VU->>HTTP: syncLocalOrders(lote de ventas isSynced=false)
+        HTTP->>API: POST /api/tpv/orders/sync (Bearer access)
+        alt 401 (acceso caducado)
+            API-->>HTTP: 401
+            HTTP->>SM: refreshIfStale(token viejo) [synchronized]
+            SM->>API: POST /api/tpv/auth/refresh
+            API-->>SM: nueva pareja de tokens
+            HTTP->>API: reintento con el token nuevo
+        end
+        API-->>VU: 200
+        VU->>VU: marca ventas isSynced = true en Room
+    end

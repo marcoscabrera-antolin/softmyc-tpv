@@ -1,0 +1,240 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/loginContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@drawable/tech_gradient_animation">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp">
+
+        <!-- LOGO / HEADER -->
+        <ImageView
+            android:contentDescription="@null"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_logo_monogram"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SoftMYC"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:textColor="#F8FAFC"
+            android:letterSpacing="-0.03"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tu_tpv_inteligente_multi_sector"
+            android:textSize="13sp"
+            android:textColor="#94A3B8"
+            android:letterSpacing="0.08"
+            android:textAllCaps="true"
+            android:layout_marginBottom="28dp"/>
+
+        <!-- EMAIL INPUT CARD -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#1E293B"
+            app:cardElevation="0dp"
+            android:layout_marginBottom="14dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:text="📧"
+                    android:textSize="20sp"
+                    android:gravity="center"/>
+
+                <EditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:hint="@string/correo_o_usuario_demo_ej_admin_fruteria_"
+                    android:inputType="textEmailAddress"
+                    android:textColor="#F8FAFC"
+                    android:textColorHint="#94A3B8"
+                    android:paddingVertical="14dp"
+                    android:textSize="15sp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- PASSWORD INPUT CARD -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#1E293B"
+            app:cardElevation="0dp"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:text="🔒"
+                    android:textSize="20sp"
+                    android:gravity="center"/>
+
+                <EditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:hint="@string/contrasena"
+                    android:inputType="textPassword"
+                    android:textColor="#F8FAFC"
+                    android:textColorHint="#94A3B8"
+                    android:paddingVertical="14dp"
+                    android:textSize="15sp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- LOGIN BUTTON -->
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="@string/iniciar_sesion"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#0F172A"
+            android:backgroundTint="#38BDF8"
+            app:cornerRadius="14dp"
+            android:letterSpacing="0.05"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- PERFILES DEMO MULTI-NEGOCIO -->
+        <TextView
+            android:id="@+id/txtDemoProfilesLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/acceso_rapido_perfiles_de_negocio"
+            android:textSize="12sp"
+            android:textColor="#94A3B8"
+            android:textAllCaps="true"
+            android:letterSpacing="0.06"
+            android:layout_marginBottom="8dp"/>
+
+        <HorizontalScrollView
+            android:id="@+id/scrollDemoProfiles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btnDemoAdmin"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/admin_multi_tenant"
+                    android:textColor="#38BDF8"
+                    app:strokeColor="#38BDF8"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/btnDemoFruteria"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fruteria_bio"
+                    android:textColor="#4ADE80"
+                    app:strokeColor="#4ADE80"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/btnDemoTaller"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/taller_motorsport"
+                    android:textColor="#FB923C"
+                    app:strokeColor="#FB923C"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/btnDemoPaqueteria"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/paqueteria_express"
+                    android:textColor="#FACC15"
+                    app:strokeColor="#FACC15"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/btnDemoMayorista"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mayorista_b2b"
+                    android:textColor="#A78BFA"
+                    app:strokeColor="#A78BFA"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/btnDemoNube"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cafeteria_la_nube"
+                    android:textColor="#38BDF8"
+                    app:strokeColor="#38BDF8"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/btnDemoBocata"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/bocateria_gourmet"
+                    android:textColor="#F472B6"
+                    app:strokeColor="#F472B6"/>
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- BIOMETRIC BUTTON -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnBio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher_foreground"
+            app:tint="#0F172A"
+            app:backgroundTint="#38BDF8"
+            android:contentDescription="@string/acceso_biometrico"
+            app:fabSize="normal"
+            app:elevation="4dp"/>
+
+    </LinearLayout>
+</ScrollView>

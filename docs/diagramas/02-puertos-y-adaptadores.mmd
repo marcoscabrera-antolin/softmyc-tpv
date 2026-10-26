@@ -1,0 +1,22 @@
+classDiagram
+    class ImprimirYGuardarVentaUseCase
+    class VentaStore { <<interface>> }
+    class TicketPrinter { <<interface>> }
+    class TicketComposer { <<interface>> }
+    class ItemsSerializer { <<interface>> }
+    class PrinterSettings { <<interface>> }
+    class VentaStoreRoom
+    class TicketPrinterAndroid
+    class TicketComposerAndroid
+    class ItemsSerializerSync
+    class PrinterSettingsPrefs
+    ImprimirYGuardarVentaUseCase --> VentaStore
+    ImprimirYGuardarVentaUseCase --> TicketPrinter
+    ImprimirYGuardarVentaUseCase --> TicketComposer
+    ImprimirYGuardarVentaUseCase --> ItemsSerializer
+    ImprimirYGuardarVentaUseCase --> PrinterSettings
+    VentaStore <|.. VentaStoreRoom
+    TicketPrinter <|.. TicketPrinterAndroid
+    TicketComposer <|.. TicketComposerAndroid
+    ItemsSerializer <|.. ItemsSerializerSync
+    PrinterSettings <|.. PrinterSettingsPrefs

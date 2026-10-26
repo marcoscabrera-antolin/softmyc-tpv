@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark"
+    android:fitsSystemWindows="true"
+    tools:context="com.softmyc.tpv.presentation.MainActivity">
+
+    <!-- Header Toolbar Row -->
+    <RelativeLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/surface_dark"
+        android:paddingHorizontal="24dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- App Logo and Brand Title -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:contentDescription="@null"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/ic_logo_monogram"
+                android:scaleType="fitCenter"
+                android:layout_marginEnd="16dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvAppTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SoftMYC"
+                    android:textColor="@color/text_primary"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-black" />
+
+                <TextView
+                    android:id="@+id/tvAppSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/terminal_punto_de_venta_profesional"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:letterSpacing="0.05"
+                    android:textAllCaps="true" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCambiarRestaurante"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_toStartOf="@id/btnEnviarResumen"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="12dp"
+            android:text="@string/negocio_admin"
+            android:textColor="@color/primary_brand"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:strokeColor="@color/primary_brand"
+            app:strokeWidth="1dp"
+            app:icon="@drawable/ic_inventory_box"
+            app:iconTint="@color/primary_brand"
+            app:iconSize="18dp"
+            app:cornerRadius="8dp" />
+
+        <!-- Top Right Utility Header Button (Resumen Semanal) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEnviarResumen"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="@string/resumen_semanal"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            app:strokeColor="@color/surface_light"
+            app:strokeWidth="1dp"
+            app:icon="@drawable/ic_mail"
+            app:iconTint="@color/text_primary"
+            app:iconSize="18dp"
+            app:cornerRadius="8dp" />
+    </RelativeLayout>
+
+    <!-- Main Grid Dashboard (3 Columns, 2 Rows) -->
+    <GridLayout
+        android:id="@+id/gridView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:rowCount="2"
+        android:columnCount="4"
+        android:padding="20dp"
+        android:useDefaultMargins="true"
+        android:alignmentMode="alignMargins"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout"
+        app:layout_constraintBottom_toTopOf="@id/bottomBar"
+        android:layout_marginVertical="8dp">
+
+        <!-- Card 1: Hacer Pedido (POS Register) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnHacerPedido"
+            style="@style/CardStyle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <FrameLayout
+                    style="@style/DashboardIconContainer"
+                    android:backgroundTint="@color/translucent_blue">
+
+                    <ImageView
+                        android:contentDescription="@null"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_shopping_cart"
+                        app:tint="@color/primary_brand" />
+                </FrameLayout>
+
+                <TextView
+                    style="@style/DashboardTitleText"
+                    android:text="@string/hacer_pedido" />
+
+                <TextView
+                    style="@style/DashboardSubtitleText"
+                    android:text="@string/crear_nueva_comanda_local" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Card 2: Monitor de Cocina (Chef web monitor) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnPedidosWeb"
+            style="@style/CardStyle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <FrameLayout
+                    style="@style/DashboardIconContainer"
+                    android:backgroundTint="@color/translucent_amber">
+
+                    <ImageView
+                        android:contentDescription="@null"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_chef"
+                        app:tint="@color/accent_amber" />
+                </FrameLayout>
+
+                <TextView
+                    style="@style/DashboardTitleText"
+                    android:text="@string/monitor_de_cocina" />
+
+                <TextView
+                    style="@style/DashboardSubtitleText"
+                    android:text="@string/pedidos_online_en_tiempo_real" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Card 3: Ver Productos (Carta / Inventario) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnVerProductos"
+            style="@style/CardStyle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <FrameLayout
+                    style="@style/DashboardIconContainer"
+                    android:backgroundTint="@color/translucent_emerald">
+
+                    <ImageView
+                        android:contentDescription="@null"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_inventory_box"
+                        app:tint="@color/secondary_brand" />
+                </FrameLayout>
+
+                <TextView
+                    style="@style/DashboardTitleText"
+                    android:text="@string/ver_productos" />
+
+                <TextView
+                    style="@style/DashboardSubtitleText"
+                    android:text="@string/carta_e_ingredientes_de_cocina" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Card 4: Estadísticas de Venta -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnEstadisticas"
+            style="@style/CardStyle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <FrameLayout
+                    style="@style/DashboardIconContainer"
+                    android:backgroundTint="@color/translucent_purple">
+
+                    <ImageView
+                        android:contentDescription="@null"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_trending_up"
+                        app:tint="@color/accent_purple" />
+                </FrameLayout>
+
+                <TextView
+                    style="@style/DashboardTitleText"
+                    android:text="@string/estadisticas_de_venta" />
+
+                <TextView
+                    style="@style/DashboardSubtitleText"
+                    android:text="@string/reportes_y_caja_diaria" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Card 5: Gestión de Tarifas (CRUD) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnGestionCrud"
+            style="@style/CardStyle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <FrameLayout
+                    style="@style/DashboardIconContainer"
+                    android:backgroundTint="@color/translucent_pink">
+
+                    <ImageView
+                        android:contentDescription="@null"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_settings_sliders"
+                        app:tint="@color/accent_pink" />
+                </FrameLayout>
+
+                <TextView
+                    style="@style/DashboardTitleText"
+                    android:text="@string/gestion_de_precios" />
+
+                <TextView
+                    style="@style/DashboardSubtitleText"
+                    android:text="@string/modificar_precios_y_carta" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Card 6: Ajustes de Sistema (Settings) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/fabAjustes"
+            style="@style/CardStyle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <FrameLayout
+                    style="@style/DashboardIconContainer"
+                    android:backgroundTint="@color/translucent_slate">
+
+                    <ImageView
+                        android:contentDescription="@null"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_settings_gear"
+                        app:tint="@color/accent_slate" />
+                </FrameLayout>
+
+                <TextView
+                    style="@style/DashboardTitleText"
+                    android:text="@string/ajustes_de_sistema" />
+
+                <TextView
+                    style="@style/DashboardSubtitleText"
+                    android:text="@string/impresora_y_sincronizacion" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <!-- Card 7: Control de Stock -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnStock"
+            style="@style/CardStyle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <FrameLayout
+                    style="@style/DashboardIconContainer"
+                    android:backgroundTint="@color/translucent_amber">
+
+                    <ImageView
+                        android:contentDescription="@null"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_inventory_box"
+                        app:tint="@color/accent_amber" />
+                </FrameLayout>
+
+                <TextView
+                    style="@style/DashboardTitleText"
+                    android:text="@string/control_de_stock" />
+
+                <TextView
+                    style="@style/DashboardSubtitleText"
+                    android:text="@string/existencias_por_producto" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Card 8: Arqueo de Cocina -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnArqueoCocina"
+            style="@style/CardStyle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <FrameLayout
+                    style="@style/DashboardIconContainer"
+                    android:backgroundTint="@color/translucent_emerald">
+
+                    <ImageView
+                        android:contentDescription="@null"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_inventory_box"
+                        app:tint="@color/accent_green" />
+                </FrameLayout>
+
+                <TextView
+                    style="@style/DashboardTitleText"
+                    android:text="@string/arqueo_de_cocina" />
+
+                <TextView
+                    style="@style/DashboardSubtitleText"
+                    android:text="@string/ingresos_del_centro_de_cocina" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </GridLayout>
+
+    <!-- Bottom Utility Action Bar: en vertical los botones no caben en una fila, así que la barra se desplaza en horizontal -->
+    <HorizontalScrollView
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/surface_dark"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:id="@+id/bottomBarContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingHorizontal="24dp"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnHistorialVentas"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:text="@string/historial_de_ventas"
+                android:textColor="@color/text_secondary"
+                android:textSize="15sp"
+                app:icon="@drawable/ic_history"
+                app:iconTint="@color/text_secondary"
+                app:iconSize="18dp"
+                app:cornerRadius="8dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSimuladorFase2"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:text="@string/simulador_multi_sector_fase_2"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/primary_brand"
+                app:cornerRadius="8dp"
+                android:layout_marginHorizontal="8dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAyuda"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:text="@string/soporte_y_ayuda"
+                android:textColor="@color/text_secondary"
+                android:textSize="15sp"
+                app:icon="@drawable/ic_help"
+                app:iconTint="@color/text_secondary"
+                app:iconSize="18dp"
+                app:cornerRadius="8dp" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
