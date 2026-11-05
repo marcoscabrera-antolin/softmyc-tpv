@@ -98,6 +98,13 @@ public class MainActivity extends BaseActivity {
         findViewById(R.id.btnStock).setOnClickListener(v ->
                 startActivity(new Intent(this, StockActivity.class)));
 
+        View btnEscandallo = findViewById(R.id.btnEscandallo);
+        // Costes y recetas: solo administrador y encargado (ocultación de cliente; el servidor valida aparte).
+        String rol = com.softmyc.tpv.data.SecurePreferencesHelper.getPrinterPrefs(this).getString("user_role", "tpv_operator");
+        boolean gestiona = "admin".equalsIgnoreCase(rol) || "encargado".equalsIgnoreCase(rol);
+        btnEscandallo.setVisibility(gestiona ? View.VISIBLE : View.GONE);
+        btnEscandallo.setOnClickListener(v -> startActivity(new Intent(this, IngredientesActivity.class)));
+
         findViewById(R.id.btnArqueoCocina).setOnClickListener(v ->
                 startActivity(new Intent(this, ArqueoCocinaActivity.class)));
 

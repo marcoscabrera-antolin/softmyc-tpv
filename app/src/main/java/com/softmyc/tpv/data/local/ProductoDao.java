@@ -44,6 +44,9 @@ public interface ProductoDao {
     @Query("UPDATE productos SET stock = :stock WHERE codigo = :codigo")
     int setStock(int codigo, int stock);
 
+    @Query("UPDATE productos SET gastosAnadidos = :gastos WHERE codigo = :codigo")
+    int setGastosAnadidos(int codigo, Double gastos);
+
     @Query("DELETE FROM productos")
     void deleteAll();
 }

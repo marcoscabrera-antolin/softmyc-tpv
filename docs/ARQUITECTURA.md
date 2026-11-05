@@ -155,6 +155,7 @@ erDiagram
         list ingredientes
         string unidadMedida
         int stock "-1 = sin control"
+        double gastosAnadidos "por unidad; v7"
     }
     ExtraLocal { string nombre PK
         double precio }
@@ -168,9 +169,46 @@ erDiagram
         string metodoPago
         string uuid "añadido en la migración 5 a 6"
     }
+    IngredienteLocal {
+        long id PK
+        string nombre
+        string nombreNormalizado UK
+        string unidad "G, ML o UD"
+        double stock "null = sin control; puede ser negativo"
+        double precioCompra "€/kg, €/L o €/ud"
+    }
+    RecetaLineaLocal {
+        long id PK
+        int productoCodigo "sin FK a productos"
+        long ingredienteId FK
+        double cantidad
+        string nombreEnCarta
+    }
+    ExtraConsumoLocal {
+        long id PK
+        string extraNormalizado "sin FK a extras"
+        long ingredienteId FK
+        double cantidad
+    }
+    IngredienteLocal ||--o{ RecetaLineaLocal : "ON DELETE CASCADE"
+    IngredienteLocal ||--o{ ExtraConsumoLocal : "ON DELETE CASCADE"
 ```
 
-Las cuatro entidades no tienen claves foráneas: `VentaLocal.itemsJson` guarda el pedido serializado (ver `ItemsSerializerSync`). Room `version = 6`, migraciones manuales 1 a 6, sin `fallbackToDestructiveMigration()`.
+Las entidades del catálogo y de ventas no tienen claves foráneas: `VentaLocal.itemsJson` guarda el pedido serializado (ver `ItemsSerializerSync`). Room `version = 7`, migraciones manuales 1 a 7, sin `fallbackToDestructiveMigration()`.
+
+#### Escandallo (v7): stock de ingredientes y coste por receta
+
+- **Modelo.** `ingredientes` (unidad G/ML/UD, existencias y precio de compra), `receta_lineas` (qué lleva cada producto por unidad vendida) y `extra_consumos` (qué gasta cada extra). Recetas y extras se enlazan por código o nombre normalizado, **sin clave foránea a productos ni a extras**: `CatalogSync` borra y reinserta el catálogo al sincronizar y una cascada se llevaría las recetas. Solo hay cascada desde `ingredientes`.
+- **Descuento al cobrar.** `VentaStockRegistrar` llama a `IngredienteStockRegistrar` dentro de la misma transacción que guarda la venta: o se guardan las dos cosas o ninguna. Al editar una venta solo se aplica la diferencia (`ConsumoIngredientes.diferencia`). Las ventas antiguas sin código de producto no tocan ingredientes, igual que no tocan el stock de producto.
+- **Reglas** (dominio puro, `domain/usecase/ConsumoIngredientes`):
+  - cada unidad gasta la receta; un ingrediente quitado ("sin tomate") no se gasta; cada extra ("+ queso") gasta su ración;
+  - **NEG-11**: solo las líneas en unidades (UD) gastan ingredientes; las de peso u horas no tienen receta por unidad (coherente con NEG-09);
+  - **NEG-12**: si un ingrediente no llega se avisa al añadir el producto (`AvisoIngredientes`), nunca se bloquea la venta;
+  - el stock de ingrediente puede quedar negativo (la pantalla muestra 0 y el descuadre): así editar y deshacer una venta devuelve exactamente lo descontado, cosa que el recorte `MAX(0, …)` del stock de producto no garantiza.
+- **Foto del coste.** Al cobrar, cada línea guarda `coste_ingredientes` y `gastos_anadidos` en su JSON (`CostesVenta.anotar`). Si después cambian precios o recetas, el beneficio de las ventas ya hechas no cambia. Las ventas anteriores se valoran con la receta actual.
+- **Rentabilidad.** `CalculadoraRentabilidad`: ventas, beneficio bruto (ventas − ingredientes), beneficio neto (bruto − gastos añadidos) y margen sobre coste. Las líneas sin coste conocido no se cuentan como beneficio y se informan aparte.
+- **Datos iniciales.** `assets/escandallo_lanube.csv` (generado desde el documento de precios por kilo y por ración del negocio) se carga una sola vez para La Nube; `EscandalloLanubeTest` comprueba que el coste de cada producto coincide con el documento de costes.
+- **Raíz de composición.** Las pantallas nuevas (`IngredientesActivity`, `RecetasActivity`) obtienen el repositorio a través de `composicion/Dependencias`, que solo entrega interfaces de dominio. Así no importan `data` y la lista de deuda de `ArquitecturaCapasTest` no crece; una regla nueva del test lo vigila.
 
 ### 6.2 PostgreSQL 16 (`tfg-db/initdb/`, multi-tenant por columna `tenant_id`)
 

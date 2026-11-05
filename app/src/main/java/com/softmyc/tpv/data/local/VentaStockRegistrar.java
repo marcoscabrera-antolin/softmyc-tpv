@@ -2,15 +2,21 @@ package com.softmyc.tpv.data.local;
 
 import com.softmyc.tpv.data.sync.SyncManager;
 import com.softmyc.tpv.domain.PedidoItem;
+import com.softmyc.tpv.domain.escandallo.LineaConsumo;
+import com.softmyc.tpv.domain.escandallo.Recetario;
 import com.softmyc.tpv.domain.usecase.StockAdvisor;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** Guarda una venta y ajusta el stock de sus líneas en una única transacción de Room. */
+/**
+ * Guarda una venta y, en la misma transacción de Room, ajusta el stock de sus productos y de los ingredientes
+ * que gasta (escandallo) y anota en cada línea su coste del momento.
+ */
 public final class VentaStockRegistrar {
 
     private VentaStockRegistrar() { }
@@ -21,9 +27,13 @@ public final class VentaStockRegistrar {
      */
     public static long registrar(AppDatabase db, VentaLocal venta, List<PedidoItem> lista, boolean descontarStock) {
         return db.runInTransaction(() -> {
+            Recetario recetario = RecetarioRoom.cargar(db);
+            venta.itemsJson = CostesVenta.anotar(venta.itemsJson, recetario);
             long id = db.ventaDao().insert(venta);
             if (descontarStock) {
                 aplicarDiferencias(db, cantidadesPorProducto(lista), new LinkedHashMap<>());
+                List<LineaConsumo> nuevas = CostesVenta.lineasConsumo(venta.itemsJson);
+                if (nuevas != null) IngredienteStockRegistrar.aplicar(db, recetario, nuevas, Collections.emptyList());
             }
             return id;
         });
@@ -38,13 +48,23 @@ public final class VentaStockRegistrar {
         return db.runInTransaction(() -> {
             VentaLocal anterior = db.ventaDao().getById(venta.id);
             Map<Integer, Integer> previas = anterior != null ? SyncManager.cantidadesPorProducto(anterior.itemsJson) : null;
+            Recetario recetario = RecetarioRoom.cargar(db);
             if (previas == null) {
                 // Venta anterior sin códigos: no consta qué stock se descontó, así que la nueva versión tampoco
                 // lo declara (si lo hiciera, la siguiente edición descontaría o devolvería de más).
                 venta.itemsJson = SyncManager.sinCodigos(venta.itemsJson);
             }
+            venta.itemsJson = CostesVenta.anotar(venta.itemsJson, recetario);
             db.ventaDao().insert(venta);
-            if (previas != null) aplicarDiferencias(db, cantidadesPorProducto(lista), previas);
+            if (previas != null) {
+                aplicarDiferencias(db, cantidadesPorProducto(lista), previas);
+                List<LineaConsumo> nuevas = CostesVenta.lineasConsumo(venta.itemsJson);
+                List<LineaConsumo> anteriores = CostesVenta.lineasConsumo(anterior.itemsJson);
+                if (nuevas != null && anteriores != null) {
+                    // Con la receta actual: si cambió entre la venta y su edición, la corrección es aproximada.
+                    IngredienteStockRegistrar.aplicar(db, recetario, nuevas, anteriores);
+                }
+            }
             return (long) venta.id;
         });
     }

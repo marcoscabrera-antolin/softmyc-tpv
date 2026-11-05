@@ -84,6 +84,7 @@ public class PedidoViewModelTest {
 
     @After
     public void tearDown() {
+        com.softmyc.tpv.composicion.Dependencias.setEscandalloParaTests(null);
         server.close();
         fondo.shutdownNow();
         SecurePreferencesHelper.getPrinterPrefs(app).edit().clear().commit();
@@ -301,6 +302,24 @@ public class PedidoViewModelTest {
 
         vm.filterByCategory("TODOS");
         assertEquals(Collections.singletonList(1), codigos(vm.productosFiltrados.getValue()));
+    }
+
+    @Test
+    public void avisa_de_los_ingredientes_que_no_llegan_sin_bloquear() throws Exception {
+        com.softmyc.tpv.presentation.RepositorioEscandalloFalso repo =
+                com.softmyc.tpv.presentation.RepositorioEscandalloFalso.conNube();
+        repo.ingredientes.put(1L, repo.ingredientes.get(1L).conStock(500.0));   // pollo para 1 Nube
+        com.softmyc.tpv.composicion.Dependencias.setEscandalloParaTests(repo);
+        vm.refrescarEscandallo();
+        PedidoItem nube = new PedidoItem(new Producto(1, "Nube", 5.5, "Bocadillos", new ArrayList<>(), "UD"), 1);
+        esperarA(() -> !vm.avisoIngredientes(nube).isEmpty());   // el pan ya está descuadrado (-2)
+
+        assertTrue(vm.avisoIngredientes(nube).startsWith("Pan:"));
+        vm.setPedidoDirectamente(new ArrayList<>(Collections.singletonList(nube)));
+        assertTrue(vm.avisoIngredientes(nube).contains("Pollo:"));
+        // Un producto sin receta no gasta nada: solo queda el aviso de lo que ya hay en el pedido.
+        assertTrue(!vm.avisoIngredientes(new PedidoItem(new Producto(9, "X", 1, "B", new ArrayList<>(), "UD"), 1))
+                .contains("Pollo:"));
     }
 
     @Test

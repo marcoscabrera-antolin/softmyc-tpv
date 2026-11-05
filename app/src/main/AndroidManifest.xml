@@ -53,6 +53,8 @@
             android:exported="false" />
         <activity android:name=".presentation.ModificarPreciosActivity" />
         <activity android:name=".presentation.StockActivity" />
+        <activity android:name=".presentation.IngredientesActivity" />
+        <activity android:name=".presentation.RecetasActivity" />
         <activity android:name=".presentation.ArqueoCocinaActivity" />
         <activity android:name=".presentation.HistorialVentasActivity" />
         <activity android:name=".presentation.AjustesActivity" />

@@ -1,32 +1,47 @@
 package com.softmyc.tpv.presentation;
 
 import com.softmyc.tpv.R;
-import com.softmyc.tpv.domain.*;
-import com.softmyc.tpv.data.*;
+import com.softmyc.tpv.data.SecurePreferencesHelper;
+import com.softmyc.tpv.data.local.AppDatabase;
+import com.softmyc.tpv.data.local.CostesVenta;
+import com.softmyc.tpv.data.local.RecetarioRoom;
 import com.softmyc.tpv.data.repo.VentaRepositoryRoom;
+import com.softmyc.tpv.domain.escandallo.Recetario;
 import com.softmyc.tpv.domain.repository.VentaResumen;
-import com.softmyc.tpv.data.sync.SyncManager;
+import com.softmyc.tpv.domain.usecase.CalculadoraRentabilidad;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.softmyc.tpv.presentation.custom.SalesChartView;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Estadísticas: tendencia de ventas del mes, ventas y beneficio (bruto y neto) del periodo elegido y ranking
+ * de productos. El beneficio y el margen solo los ven administrador y encargado.
+ */
 public class EstadisticasActivity extends BaseActivity {
 
+    enum Periodo { HOY, SEMANA, MES }
+
     private ListView listaRanking;
+    private Periodo periodo = Periodo.HOY;
+    private boolean verBeneficio;
+
+    /** Ventas desde el inicio del periodo más largo, cargadas una vez; cambiar de periodo solo vuelve a calcular. */
+    private List<VentaResumen> ventasCargadas;
+    private Recetario recetario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,116 +51,140 @@ public class EstadisticasActivity extends BaseActivity {
         setupBackButton();
         listaRanking = findViewById(R.id.listaRanking);
 
-        // CALCULAR EL RANKING Y LA TENDENCIA
-        calcularRanking();
+        String rol = SecurePreferencesHelper.getPrinterPrefs(this).getString("user_role", "tpv_operator");
+        verBeneficio = "admin".equalsIgnoreCase(rol) || "encargado".equalsIgnoreCase(rol);
+        int visibilidad = verBeneficio ? View.VISIBLE : View.GONE;
+        findViewById(R.id.cajaBruto).setVisibility(visibilidad);
+        findViewById(R.id.cajaNeto).setVisibility(visibilidad);
+        findViewById(R.id.cajaMargen).setVisibility(visibilidad);
+
+        MaterialButtonToggleGroup grupo = findViewById(R.id.grupoPeriodo);
+        grupo.addOnButtonCheckedListener((g, id, marcado) -> {
+            if (!marcado) return;
+            periodo = id == R.id.btnPeriodoSemana ? Periodo.SEMANA : id == R.id.btnPeriodoMes ? Periodo.MES : Periodo.HOY;
+            mostrarPeriodo();
+        });
+
+        cargar();
     }
 
-    private void calcularRanking() {
-        // Filtramos desde el día 1 del mes actual a las 00:00:00
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        long inicioMesMs = cal.getTimeInMillis();
+    /** Inicio (00:00) del periodo que contiene {@code ahora}. La semana empieza en lunes. */
+    static long inicioDe(Periodo p, Calendar ahora) {
+        Calendar c = (Calendar) ahora.clone();
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        if (p == Periodo.MES) {
+            c.set(Calendar.DAY_OF_MONTH, 1);
+        } else if (p == Periodo.SEMANA) {
+            int desdeLunes = (c.get(Calendar.DAY_OF_WEEK) + 5) % 7;
+            c.add(Calendar.DAY_OF_MONTH, -desdeLunes);
+        }
+        return c.getTimeInMillis();
+    }
 
-        // Obtener el número de días en el mes actual
-        Calendar calFinal = Calendar.getInstance();
-        int maxDays = calFinal.getActualMaximum(Calendar.DAY_OF_MONTH);
+    private void cargar() {
+        Calendar ahora = Calendar.getInstance();
+        long inicioMes = inicioDe(Periodo.MES, ahora);
+        long desde = Math.min(inicioMes, inicioDe(Periodo.SEMANA, ahora));
 
-        // Inicializar mapa de ventas ordenadas por día para todo el mes actual
-        SimpleDateFormat dayFormat = new SimpleDateFormat("dd MMM", new java.util.Locale("es", "ES"));
-        Map<String, Double> ventasPorDia = new java.util.LinkedHashMap<>();
-        for (int i = 1; i <= maxDays; i++) {
-            Calendar loopCal = Calendar.getInstance();
-            loopCal.set(Calendar.DAY_OF_MONTH, i);
-            String diaKey = dayFormat.format(loopCal.getTime());
-            ventasPorDia.put(diaKey, 0.0);
+        // Gráfica: un punto por día del mes en curso.
+        SimpleDateFormat formatoDia = new SimpleDateFormat("dd MMM", new Locale("es", "ES"));
+        Map<String, Double> ventasPorDia = new LinkedHashMap<>();
+        int diasMes = ahora.getActualMaximum(Calendar.DAY_OF_MONTH);
+        for (int i = 1; i <= diasMes; i++) {
+            Calendar dia = (Calendar) ahora.clone();
+            dia.set(Calendar.DAY_OF_MONTH, i);
+            ventasPorDia.put(formatoDia.format(dia.getTime()), 0.0);
         }
 
         AppExecutors.disco().execute(() -> {
-            // El filtro por mes lo hace SQLite con el índice de fecha, en lugar de cargar todo el histórico.
-            List<VentaResumen> ventasRoom = new VentaRepositoryRoom(getApplicationContext()).getDesde(inicioMesMs);
-            Map<String, Long> contadorProductos = new HashMap<>();
-
-            for (VentaResumen venta : ventasRoom) {
-                // 1. Total diario
-                String diaKey = dayFormat.format(new Date(venta.fechaMs));
-                if (ventasPorDia.containsKey(diaKey)) {
-                    ventasPorDia.put(diaKey, ventasPorDia.get(diaKey) + venta.total);
-                }
-
-                // 2. Ranking productos
-                List<PedidoItem> items;
-                try {
-                    items = SyncManager.deserializarItems(venta.itemsJson, null);
-                } catch (DeserializacionVentaException e) {
-                    // Sin detalle legible la venta no suma al ranking de productos; sus importes sí cuentan.
-                    android.util.Log.w("EstadisticasActivity", "Venta " + venta.id + " sin detalle legible", e);
-                    items = null;
-                }
-                if (items != null) {
-                    for (PedidoItem item : items) {
-                        String nombre = item.getNombre();
-                        long cant = item.getCantidad();
-                        contadorProductos.put(nombre, contadorProductos.getOrDefault(nombre, 0L) + cant);
-                    }
-                }
+            // El filtro por fecha lo hace SQLite con el índice, en lugar de cargar todo el histórico.
+            List<VentaResumen> ventas = new VentaRepositoryRoom(getApplicationContext()).getDesde(desde);
+            Recetario rec = RecetarioRoom.cargar(AppDatabase.getDatabase(getApplicationContext()));
+            for (VentaResumen v : ventas) {
+                if (v.fechaMs < inicioMes) continue;
+                String clave = formatoDia.format(new Date(v.fechaMs));
+                if (ventasPorDia.containsKey(clave)) ventasPorDia.put(clave, ventasPorDia.get(clave) + v.total);
             }
-
-            List<Map.Entry<String, Long>> listaOrdenada = new ArrayList<>(contadorProductos.entrySet());
-            Collections.sort(listaOrdenada, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
-
             AppExecutors.enUiSiViva(this, () -> {
-                RankingAdapter adapter = new RankingAdapter(this, listaOrdenada);
-                listaRanking.setAdapter(adapter);
-
-                List<Double> chartValores = new ArrayList<>();
-                List<String> chartLabels = new ArrayList<>();
-                for (Map.Entry<String, Double> entry : ventasPorDia.entrySet()) {
-                    chartLabels.add(entry.getKey());
-                    chartValores.add(entry.getValue());
-                }
-
-                SalesChartView salesChartView = findViewById(R.id.salesChartView);
-                if (salesChartView != null) {
-                    salesChartView.setData(chartValores, chartLabels);
-                }
+                ventasCargadas = ventas;
+                recetario = rec;
+                List<Double> valores = new ArrayList<>(ventasPorDia.values());
+                List<String> etiquetas = new ArrayList<>(ventasPorDia.keySet());
+                SalesChartView grafica = findViewById(R.id.salesChartView);
+                if (grafica != null) grafica.setData(valores, etiquetas);
+                mostrarPeriodo();
             });
         });
     }
 
-    // --- ADAPTADOR PERSONALIZADO ---
-    private class RankingAdapter extends android.widget.ArrayAdapter<Map.Entry<String, Long>> {
-        
-        public RankingAdapter(android.content.Context context, List<Map.Entry<String, Long>> list) {
+    private void mostrarPeriodo() {
+        if (ventasCargadas == null) return;
+        CalculadoraRentabilidad.Resumen r = resumenDe(ventasCargadas, recetario, inicioDe(periodo, Calendar.getInstance()));
+
+        ((TextView) findViewById(R.id.txtVentasPeriodo)).setText(FormatoEscandallo.euros(r.ventas));
+        ((TextView) findViewById(R.id.txtBeneficioBruto)).setText(FormatoEscandallo.euros(r.beneficioBruto));
+        ((TextView) findViewById(R.id.txtBeneficioNeto)).setText(FormatoEscandallo.euros(r.beneficioNeto));
+        ((TextView) findViewById(R.id.txtMargen)).setText(r.margen != null ? FormatoEscandallo.porcentaje(r.margen) : "—");
+
+        TextView aviso = findViewById(R.id.txtAvisoSinCoste);
+        boolean hayHueco = verBeneficio && r.unidadesSinCoste > 0;
+        aviso.setVisibility(hayHueco ? View.VISIBLE : View.GONE);
+        if (hayHueco) {
+            aviso.setText(getString(R.string.rentabilidad_sin_coste_fmt, FormatoEscandallo.numero(r.unidadesSinCoste),
+                    FormatoEscandallo.euros(r.ventas - r.ventasConCoste)));
+        }
+        List<CalculadoraRentabilidad.PorProducto> ranking = new ArrayList<>(r.ranking);
+        // Sin permiso para ver el beneficio, el ranking es por unidades (como antes): su orden no lo delata.
+        if (!verBeneficio) ranking.sort((x, y) -> Double.compare(y.unidades, x.unidades));
+        listaRanking.setAdapter(new RankingAdapter(this, ranking));
+    }
+
+    /** Resumen de las ventas desde {@code desdeMs}. Las ventas con detalle ilegible suman a ventas pero no al beneficio. */
+    static CalculadoraRentabilidad.Resumen resumenDe(List<VentaResumen> ventas, Recetario recetario, long desdeMs) {
+        double total = 0;
+        List<CalculadoraRentabilidad.Linea> lineas = new ArrayList<>();
+        for (VentaResumen v : ventas) {
+            if (v.fechaMs < desdeMs) continue;
+            total += v.total;
+            List<CalculadoraRentabilidad.Linea> deVenta = CostesVenta.lineasRentabilidad(v.itemsJson, recetario);
+            if (deVenta != null) lineas.addAll(deVenta);
+        }
+        return CalculadoraRentabilidad.calcular(total, lineas);
+    }
+
+    // --- ADAPTADOR DEL RANKING ---
+    private class RankingAdapter extends android.widget.ArrayAdapter<CalculadoraRentabilidad.PorProducto> {
+
+        RankingAdapter(android.content.Context context, List<CalculadoraRentabilidad.PorProducto> list) {
             super(context, 0, list);
         }
 
         @Override
-        public android.view.View getView(int position, android.view.View convertView, android.view.ViewGroup parent) {
+        public View getView(int position, View convertView, android.view.ViewGroup parent) {
             if (convertView == null) {
                 convertView = android.view.LayoutInflater.from(getContext()).inflate(R.layout.item_ranking, parent, false);
             }
-
-            Map.Entry<String, Long> item = getItem(position);
+            CalculadoraRentabilidad.PorProducto item = getItem(position);
 
             TextView txtPosicion = convertView.findViewById(R.id.txtPosicion);
             TextView txtNombre = convertView.findViewById(R.id.txtNombreProducto);
             TextView txtVentas = convertView.findViewById(R.id.txtVentas);
 
-            // Posición + Medallas
             if (position == 0) txtPosicion.setText("🥇");
             else if (position == 1) txtPosicion.setText("🥈");
             else if (position == 2) txtPosicion.setText("🥉");
             else txtPosicion.setText(String.valueOf(position + 1));
 
             if (item != null) {
-                txtNombre.setText(item.getKey());
-                txtVentas.setText(getString(R.string.estadisticas_unidades_fmt, item.getValue()));
+                txtNombre.setText(item.producto);
+                String unidades = getString(R.string.estadisticas_unidades_fmt, FormatoEscandallo.numero(item.unidades));
+                txtVentas.setText(verBeneficio && item.beneficioNeto != null
+                        ? getString(R.string.rentabilidad_ranking_fmt, unidades, FormatoEscandallo.euros(item.beneficioNeto))
+                        : unidades);
             }
-            
             return convertView;
         }
     }

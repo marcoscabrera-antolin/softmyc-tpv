@@ -15,7 +15,8 @@ import com.softmyc.tpv.data.local.cifrado.ProveedorCifrado;
 
 import java.io.File;
 
-@Database(entities = {ProductoLocal.class, ExtraLocal.class, SalsaLocal.class, VentaLocal.class}, version = 6, exportSchema = true)
+@Database(entities = {ProductoLocal.class, ExtraLocal.class, SalsaLocal.class, VentaLocal.class,
+        IngredienteLocal.class, RecetaLineaLocal.class, ExtraConsumoLocal.class}, version = 7, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -43,6 +44,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ExtraDao extraDao();
     public abstract SalsaDao salsaDao();
     public abstract VentaDao ventaDao();
+    public abstract EscandalloDao escandalloDao();
 
     /**
      * C4: Migración de v1 a v2.
@@ -106,8 +108,37 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    /**
+     * Migración de v6 a v7: escandallo (ingredientes, recetas y consumo de extras) y gastos añadidos por producto.
+     * El SQL es el que genera Room para la v7 (app/schemas/.../7.json); las tablas nacen vacías.
+     */
+    static final Migration MIGRATION_6_7 = new Migration(6, 7) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE productos ADD COLUMN gastosAnadidos REAL");
+            database.execSQL("CREATE TABLE IF NOT EXISTS `ingredientes` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                    + "`nombre` TEXT NOT NULL, `nombreNormalizado` TEXT NOT NULL, `unidad` TEXT NOT NULL, `stock` REAL, "
+                    + "`precioCompra` REAL)");
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_ingredientes_nombreNormalizado` "
+                    + "ON `ingredientes` (`nombreNormalizado`)");
+            database.execSQL("CREATE TABLE IF NOT EXISTS `receta_lineas` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                    + "`productoCodigo` INTEGER NOT NULL, `ingredienteId` INTEGER NOT NULL, `cantidad` REAL NOT NULL, "
+                    + "`nombreEnCarta` TEXT, FOREIGN KEY(`ingredienteId`) REFERENCES `ingredientes`(`id`) "
+                    + "ON UPDATE NO ACTION ON DELETE CASCADE )");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_receta_lineas_productoCodigo` ON `receta_lineas` (`productoCodigo`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_receta_lineas_ingredienteId` ON `receta_lineas` (`ingredienteId`)");
+            database.execSQL("CREATE TABLE IF NOT EXISTS `extra_consumos` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                    + "`extra` TEXT NOT NULL, `extraNormalizado` TEXT NOT NULL, `ingredienteId` INTEGER NOT NULL, "
+                    + "`cantidad` REAL NOT NULL, FOREIGN KEY(`ingredienteId`) REFERENCES `ingredientes`(`id`) "
+                    + "ON UPDATE NO ACTION ON DELETE CASCADE )");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_extra_consumos_extraNormalizado` ON `extra_consumos` (`extraNormalizado`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_extra_consumos_ingredienteId` ON `extra_consumos` (`ingredienteId`)");
+        }
+    };
+
     /** Cadena completa de migraciones; la usan la base real y los tests de migración. */
-    static final Migration[] ALL_MIGRATIONS = {MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6};
+    static final Migration[] ALL_MIGRATIONS = {MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6,
+            MIGRATION_6_7};
 
     /**
      * Negocio activo (id canónico) según la sesión, o null si no hay ninguno válido. No hay valor por defecto.

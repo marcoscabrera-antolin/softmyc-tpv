@@ -484,6 +484,21 @@
                 app:iconSize="18dp"
                 app:cornerRadius="8dp" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEscandallo"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:layout_marginStart="8dp"
+                android:text="@string/escandallo_boton"
+                android:textColor="@color/text_secondary"
+                android:textSize="15sp"
+                android:visibility="gone"
+                app:icon="@drawable/ic_inventory_box"
+                app:iconTint="@color/text_secondary"
+                app:iconSize="18dp"
+                app:cornerRadius="8dp" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"

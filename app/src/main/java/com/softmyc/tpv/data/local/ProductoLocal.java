@@ -16,6 +16,8 @@ public class ProductoLocal {
 
     public String unidadMedida = "UD";
     public int stock = -1;
+    /** Gastos añadidos por unidad (luz, gas, personal, envases…); null = sin definir. */
+    public Double gastosAnadidos;
 
     public ProductoLocal() {}
 

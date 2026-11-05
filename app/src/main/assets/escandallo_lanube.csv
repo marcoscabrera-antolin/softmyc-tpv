@@ -1,0 +1,336 @@
+# Escandallo de La Nube. Generado desde ingredientes.md y la carta; costes comprobados contra coste_bocadillos_final.
+# tipo;clave;ingrediente;unidad;cantidad;nombre_en_carta;precio_compra
+# ING: ingrediente (precio por kg o por ud). REC: línea de receta del producto <clave>. EXT: lo que gasta el extra <clave>. GAS: gastos añadidos por unidad del producto <clave>.
+ING;;Pollo;G;;;6.99
+ING;;Lomo;G;;;5.99
+ING;;Rulo de cabra;G;;;15.01
+ING;;Lechuga;G;;;2.5
+ING;;Cebolla;G;;;2.0
+ING;;Bacon;G;;;5.0
+ING;;Tomate natural;G;;;2.4
+ING;;Queso;G;;;5.0
+ING;;Jamón;G;;;8.0
+ING;;Solomillo de cerdo;G;;;8.0
+ING;;Tortilla;G;;;2.8
+ING;;Patatas paja;G;;;10.0
+ING;;Salsa;G;;;1.66
+ING;;Patatas;G;;;0.8
+ING;;Pimiento;G;;;2.8
+ING;;Calamares;G;;;7.2
+ING;;Solomillo empanado;G;;;9.0
+ING;;Atún;G;;;6.9
+ING;;Espárragos;G;;;12.0
+ING;;Carne;G;;;5.9
+ING;;York;G;;;4.2
+ING;;Queso curado;G;;;16.0
+ING;;Panceta;G;;;5.99
+ING;;Cheddar;G;;;4.78
+ING;;Pan;UD;;;0.35
+ING;;Pan hamburguesa;UD;;;0.21
+ING;;Pan brioche;UD;;;0.35
+ING;;Pan sandwich;UD;;;0.14
+ING;;Pan perrito;UD;;;0.265
+ING;;Pollo empanado;UD;;;2.5
+ING;;Salchichas;UD;;;0.45
+ING;;Salchicha perrito;UD;;;0.19
+ING;;Huevo;UD;;;0.23
+ING;;Cebolla crujiente;UD;;;0.2
+ING;;Roquefort;G;;;
+ING;;Ración de alas;UD;;;1.8
+ING;;Ración de patatas;UD;;;0.6
+ING;;Ración cheddar bacon;UD;;;2.56
+ING;;Ración de panceta;UD;;;4.15
+ING;;Panini;UD;;;1.3
+ING;;Cartucho de patatas;UD;;;0.27
+REC;1;Pollo;;333.333;Pollo;
+REC;1;Jamón;;71.25;Jamón;
+REC;1;Salsa;;150.602;Salsa Nube;
+REC;1;Pan;;1.0;;
+REC;2;Pollo;;333.333;Pollo;
+REC;2;Jamón;;71.25;Jamón;
+REC;2;Tomate natural;;28.333;Tomate Natural;
+REC;2;Lechuga;;100.0;Lechuga;
+REC;2;Salsa;;150.602;Salsa Nube;
+REC;2;Pan;;1.0;;
+REC;3;Lomo;;250.417;Lomo;
+REC;3;Queso;;82.0;Queso;
+REC;3;Lechuga;;100.0;Lechuga;
+REC;3;Tomate natural;;28.333;Tomate Natural;
+REC;3;Salsa;;150.602;Mayonesa;
+REC;3;Pan;;1.0;;
+REC;4;Lomo;;250.417;Lomo;
+REC;4;Lechuga;;100.0;Lechuga;
+REC;4;Tomate natural;;28.333;Tomate Tomate;
+REC;4;Patatas;;250.0;Patatas;
+REC;4;Salsa;;150.602;Mayonesa;
+REC;4;Pan;;1.0;;
+REC;5;Lomo;;250.417;Lomo;
+REC;5;Pimiento;;82.143;Pimiento;
+REC;5;Jamón;;71.25;Jamón;
+REC;5;Lechuga;;100.0;Lechuga;
+REC;5;Tomate natural;;28.333;Tomate Natural;
+REC;5;Salsa;;150.602;Salsa Mahonesa;
+REC;5;Pan;;1.0;;
+REC;6;Lomo;;250.417;Lomo;
+REC;6;Pimiento;;82.143;Pimiento;
+REC;6;Jamón;;71.25;Jamón;
+REC;6;Lechuga;;100.0;Lechuga;
+REC;6;Tomate natural;;28.333;Tomate Natural;
+REC;6;Tortilla;;82.143;Tortilla;
+REC;6;Bacon;;126.0;Bacon;
+REC;6;Salsa;;150.602;Salsa;
+REC;6;Pan;;1.0;;
+REC;7;Lomo;;250.417;Lomo;
+REC;7;Bacon;;126.0;Bacon;
+REC;7;Queso;;82.0;Queso;
+REC;7;Lechuga;;100.0;Lechuga;
+REC;7;Salsa;;150.602;Mayonesa;
+REC;7;Pan;;1.0;;
+REC;8;Salchichas;;1.0;Salchichas;
+REC;8;Bacon;;126.0;Bacón;
+REC;8;Queso;;82.0;Queso;
+REC;8;Pan;;1.0;;
+REC;10;Pollo empanado;;1.0;Pollo Empanado;
+REC;10;Tomate natural;;28.333;Tomate Natural;
+REC;10;Lechuga;;100.0;Lechuga;
+REC;10;Salsa;;150.602;Salsa;
+REC;10;Pan;;1.0;;
+REC;11;Atún;;82.609;Atún;
+REC;11;Tomate natural;;28.333;Tomate Natural;
+REC;11;Lechuga;;100.0;Lechuga;
+REC;11;Cebolla;;100.0;Cebolla;
+REC;11;Espárragos;;23.333;Espárragos;
+REC;11;Salsa;;150.602;Mayonesa;
+REC;11;Pan;;1.0;;
+REC;12;Tortilla;;164.286;Tortilla Francesa;
+REC;12;Tomate natural;;28.333;Tomate Natural;
+REC;12;Salsa;;150.602;Salsa;
+REC;12;Pan;;1.0;;
+REC;13;Bacon;;384.0;Bacon;
+REC;13;Queso;;82.0;Queso;
+REC;13;Pan;;1.0;;
+REC;14;York;;135.714;Jamon York;
+REC;14;Queso;;82.0;Queso;
+REC;14;Pan sandwich;;1.0;;
+REC;15;Jamón;;178.125;Jamón;
+REC;15;Tomate natural;;28.333;Tomate Natural;
+REC;15;Pan;;1.0;;
+REC;16;Pollo;;333.333;pollo;
+REC;16;Lechuga;;100.0;Lechuga;
+REC;16;Tomate natural;;28.333;Tomate Natural;
+REC;16;Salsa;;150.602;Mayonesa;
+REC;16;Pan;;1.0;;
+REC;17;Lomo;;125.209;Lomo;
+REC;17;Tomate natural;;28.333;Tomate Natural;
+REC;17;Pan sandwich;;1.0;;
+REC;18;Calamares;;400.0;Calamares;
+REC;18;Lechuga;;100.0;Lechuga;
+REC;18;Salsa;;150.602;Mayonesa;
+REC;18;Pan;;1.0;;
+REC;21;Pollo;;333.333;pollo;
+REC;21;Lechuga;;100.0;Lechuga;
+REC;21;York;;135.714;Jamón York;
+REC;21;Queso;;82.0;Queso;
+REC;21;Salsa;;150.602;Salsa;
+REC;21;Pan;;1.0;;
+REC;22;Tomate natural;;28.333;Tomate Natural;
+REC;22;Lechuga;;100.0;Lechuga;
+REC;22;Atún;;82.609;Atún;
+REC;22;Cebolla;;100.0;Cebolla;
+REC;22;Espárragos;;23.333;Espárragos;
+REC;22;Salsa;;150.602;Mayonesa;
+REC;22;Pan sandwich;;1.0;;
+REC;23;Tomate natural;;28.333;Tomate Natural;
+REC;23;Lechuga;;100.0;Lechuga;
+REC;23;Atún;;82.609;Atún;
+REC;23;Cebolla;;100.0;Cebolla;
+REC;23;Espárragos;;23.333;Espárragos;
+REC;23;Huevo;;1.0;Huevo;
+REC;23;Salsa;;150.602;Mayonesa;
+REC;23;Pan sandwich;;1.0;;
+REC;25;Pollo;;166.667;pollo;
+REC;25;Lomo;;125.209;Lomo;
+REC;25;Patatas;;250.0;patatas;
+REC;25;Tortilla;;82.143;tortilla;
+REC;25;Jamón;;71.25;Jamón;
+REC;25;Queso;;82.0;queso;
+REC;25;Lechuga;;100.0;Lechuga;
+REC;25;Tomate natural;;28.333;Tomate Natural;
+REC;25;Salsa;;150.602;Salsa;
+REC;25;Pan;;1.0;;
+REC;26;Carne;;249.153;Carne;
+REC;26;Tomate natural;;14.167;Tomate Nat;
+REC;26;Lechuga;;50.0;Lechuga;
+REC;26;Cebolla;;50.0;Cebolla A La Plancha;
+REC;26;Queso;;41.0;Queso;
+REC;26;Salsa;;75.301;Tomate;
+REC;26;Salsa;;75.301;Mayonesa;
+REC;26;Pan hamburguesa;;1.0;;
+REC;27;Carne;;249.153;Carne;
+REC;27;Tomate natural;;14.167;Tomate Nat;
+REC;27;Lechuga;;50.0;Lechuga;
+REC;27;Cebolla;;50.0;Cebolla;
+REC;27;Queso;;41.0;Queso;
+REC;27;Patatas;;125.0;Patatas;
+REC;27;Salsa;;75.301;Tomate;
+REC;27;Salsa;;75.301;Mayonesa;
+REC;27;Pan hamburguesa;;1.0;;
+REC;28;Carne;;249.153;Carne;
+REC;28;Tomate natural;;14.167;Tomate Nat;
+REC;28;Lechuga;;50.0;Lechuga;
+REC;28;Queso;;41.0;Queso;
+REC;28;Cebolla;;50.0;Cebolla;
+REC;28;Bacon;;64.0;Bacon;
+REC;28;Patatas;;125.0;Patatas;
+REC;28;Huevo;;1.0;Huevo;
+REC;28;Salsa;;150.602;Salsa;
+REC;28;Pan hamburguesa;;1.0;;
+REC;29;Carne;;249.153;Carne;
+REC;29;Tomate natural;;14.167;Tomate Nat;
+REC;29;Lechuga;;50.0;Lechuga;
+REC;29;Cebolla;;50.0;Cebolla;
+REC;29;Queso;;41.0;Queso;
+REC;29;York;;66.667;York;
+REC;29;Tortilla;;82.143;Tortilla;
+REC;29;Patatas;;125.0;Patatas;
+REC;29;Jamón;;35.0;Jamón Serrano;
+REC;29;Salsa;;150.602;Salsa;
+REC;29;Pan hamburguesa;;1.0;;
+REC;30;Carne;;498.305;2 Carnes;
+REC;30;Tomate natural;;14.167;Tomate Nat;
+REC;30;Lechuga;;50.0;Lechuga;
+REC;30;Cebolla;;50.0;Cebolla;
+REC;30;Queso;;41.0;Queso;
+REC;30;Salsa;;150.602;Salsa;
+REC;30;Pan hamburguesa;;1.0;;
+REC;31;Solomillo empanado;;250.0;Solomillo de Pollo Empanado;
+REC;31;Queso;;41.0;Queso;
+REC;31;Bacon;;64.0;Bacon;
+REC;31;Salsa;;301.205;Barbacoa;
+REC;31;Pan brioche;;1.0;;
+REC;32;Carne;;249.153;Carne;
+REC;32;Bacon;;64.0;Bacon;
+REC;32;Huevo;;1.0;Huevo;
+REC;32;Queso;;41.0;Queso;
+REC;32;Salsa;;150.602;Barbacoa;
+REC;32;Pan hamburguesa;;1.0;;
+REC;33;Lomo;;250.417;Lomo;
+REC;33;Patatas;;250.0;Patatas;
+REC;33;Huevo;;1.0;Huevo;
+REC;33;Jamón;;71.25;Jamón Serrano;
+REC;33;Salsa;;150.602;mayonesa;
+REC;33;Pan;;1.0;;
+REC;34;Lomo;;250.417;Lomo;
+REC;34;Bacon;;126.0;Bacon;
+REC;34;Queso;;82.0;Queso;
+REC;34;Tortilla;;82.143;Tortilla;
+REC;34;Salsa;;150.602;Mayonesa;
+REC;34;Pan;;1.0;;
+REC;35;Lomo;;250.417;Lomo;
+REC;35;Atún;;82.609;Atún;
+REC;35;Bacon;;126.0;Bacon;
+REC;35;Lechuga;;100.0;Lechuga;
+REC;35;Queso;;82.0;Queso;
+REC;35;Salsa;;150.602;Salsa Barbacoa;
+REC;35;Pan;;1.0;;
+REC;36;Lomo;;250.417;Lomo;
+REC;36;Pimiento;;82.143;Pimiento;
+REC;36;Queso curado;;100.0;Queso Curado;
+REC;36;Pan;;1.0;;
+REC;38;Solomillo de cerdo;;300.0;Solomillo de Cerdo;
+REC;38;Rulo de cabra;;99.933;Rulo de Cabra;
+REC;38;Cebolla;;100.0;Cebolla Caramelizada;
+REC;38;Salsa;;150.602;Salsa de Ajo;
+REC;38;Pan;;1.0;;
+REC;50;Pan perrito;;1.0;;
+REC;50;Salchicha perrito;;1.0;;
+REC;50;Salsa;;301.205;Salsa;
+REC;51;Pan perrito;;1.0;;
+REC;51;Salchicha perrito;;1.0;;
+REC;51;Salsa;;301.205;Salsa;
+REC;51;Patatas paja;;75.0;Patatas Paja;
+REC;51;Cebolla crujiente;;1.0;Cebolla Crujiente;
+REC;52;Ración de alas;;1.0;;
+REC;53;Cartucho de patatas;;1.0;;
+REC;53;Salsa;;150.602;Salsa;
+REC;54;Ración de patatas;;1.0;;
+REC;54;Salsa;;301.205;Salsa;
+REC;55;Ración cheddar bacon;;1.0;;
+REC;56;Ración de panceta;;1.0;;
+REC;57;Panceta;;333.89;;
+REC;57;Pan;;1.0;;
+REC;60;Panini;;1.0;;
+EXT;Pollo;Pollo;;333.333;;
+EXT;Dos Carnes;Carne;;249.153;;
+EXT;Lomo;Lomo;;250.417;;
+EXT;Calamares;Calamares;;400.0;;
+EXT;Carne;Carne;;249.153;;
+EXT;Solomillo de Cerdo;Solomillo de cerdo;;300.0;;
+EXT;Queso;Queso;;82.0;;
+EXT;Queso Curado;Queso curado;;100.0;;
+EXT;Bacon;Bacon;;126.0;;
+EXT;Cebolla;Cebolla;;100.0;;
+EXT;Tomate natural;Tomate natural;;28.333;;
+EXT;Lechuga;Lechuga;;100.0;;
+EXT;York;York;;135.714;;
+EXT;Atun;Atún;;82.609;;
+EXT;Esparragos;Espárragos;;23.333;;
+EXT;Tortilla;Tortilla;;82.143;;
+EXT;Huevo;Huevo;;1.0;;
+EXT;Pimiento;Pimiento;;82.143;;
+EXT;Patatas;Patatas;;250.0;;
+EXT;Jamon;Jamón;;71.25;;
+EXT;Salchichas;Salchichas;;1.0;;
+EXT;Patatas Paja;Patatas paja;;75.0;;
+EXT;Cebolla Crujiente;Cebolla crujiente;;1.0;;
+EXT;Pollo Empanado;Pollo empanado;;1.0;;
+EXT;Cebolla Caramelizada;Cebolla;;100.0;;
+EXT;Rulo de Cabra;Rulo de cabra;;99.933;;
+GAS;1;;;1.69;;
+GAS;2;;;1.69;;
+GAS;3;;;1.69;;
+GAS;4;;;1.69;;
+GAS;5;;;1.69;;
+GAS;6;;;1.69;;
+GAS;7;;;1.69;;
+GAS;8;;;1.69;;
+GAS;9;;;1.69;;
+GAS;10;;;1.69;;
+GAS;11;;;1.69;;
+GAS;12;;;1.69;;
+GAS;13;;;1.69;;
+GAS;14;;;1.01;;
+GAS;15;;;1.69;;
+GAS;16;;;1.69;;
+GAS;17;;;1.01;;
+GAS;18;;;1.69;;
+GAS;19;;;1.69;;
+GAS;20;;;1.69;;
+GAS;21;;;1.69;;
+GAS;22;;;1.01;;
+GAS;23;;;1.01;;
+GAS;24;;;1.69;;
+GAS;25;;;1.69;;
+GAS;26;;;1.69;;
+GAS;27;;;1.69;;
+GAS;28;;;1.69;;
+GAS;29;;;1.69;;
+GAS;30;;;1.69;;
+GAS;31;;;1.69;;
+GAS;32;;;1.69;;
+GAS;33;;;1.69;;
+GAS;34;;;1.69;;
+GAS;35;;;1.69;;
+GAS;36;;;1.69;;
+GAS;38;;;1.69;;
+GAS;50;;;0.15;;
+GAS;51;;;0.15;;
+GAS;52;;;1.01;;
+GAS;53;;;1.01;;
+GAS;54;;;1.01;;
+GAS;55;;;1.01;;
+GAS;56;;;1.01;;
+GAS;57;;;1.69;;
+GAS;58;;;1.69;;
+GAS;59;;;1.69;;
+GAS;60;;;1.01;;

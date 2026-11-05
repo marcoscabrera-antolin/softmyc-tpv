@@ -110,6 +110,25 @@ public class AppDatabaseMigrationTest {
     }
 
     @Test
+    public void migrates_from_v6_creatingEmptyEscandalloTables_keepingData() {
+        createLegacyDatabase(6);
+        AppDatabase db = openWithMigrations();
+        assertDataIntact(db);
+        assertEquals("0", scalar(db, "SELECT COUNT(*) FROM ingredientes"));
+        assertEquals("0", scalar(db, "SELECT COUNT(*) FROM receta_lineas"));
+        assertEquals("0", scalar(db, "SELECT COUNT(*) FROM extra_consumos"));
+        assertEquals("1", scalar(db, "SELECT COUNT(*) FROM productos WHERE gastosAnadidos IS NULL"));
+    }
+
+    @Test
+    public void escandallo_existe_tras_migrar_desde_cualquier_version() {
+        createLegacyDatabase(1);
+        AppDatabase db = openWithMigrations();
+        assertEquals("3", scalar(db, "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' "
+                + "AND name IN ('ingredientes', 'receta_lineas', 'extra_consumos')"));
+    }
+
+    @Test
     public void migrates_from_v1_giving_every_sale_a_uuid() {
         createLegacyDatabase(1);
         AppDatabase db = openWithMigrations();
@@ -120,6 +139,7 @@ public class AppDatabaseMigrationTest {
     public void opensFreshDatabaseAtCurrentVersion() {
         AppDatabase db = openWithMigrations();
         assertEquals(0, Integer.parseInt(scalar(db, "SELECT COUNT(*) FROM ventas")));
+        assertEquals("7", scalar(db, "PRAGMA user_version"));
     }
 
     private AppDatabase openWithMigrations() {
@@ -160,6 +180,7 @@ public class AppDatabaseMigrationTest {
             boolean hasIndices = version >= 3;
             boolean hasUnit = version >= 4;
             boolean hasStock = version >= 5;
+            boolean hasUuid = version >= 6;
 
             sqlite.execSQL("CREATE TABLE productos (codigo INTEGER NOT NULL, nombre TEXT, precio REAL NOT NULL, "
                     + "categoria TEXT, ingredientes TEXT" + (hasUnit ? ", unidadMedida TEXT DEFAULT 'UD'" : "")
@@ -169,7 +190,8 @@ public class AppDatabaseMigrationTest {
             sqlite.execSQL("CREATE TABLE salsas (nombre TEXT NOT NULL, PRIMARY KEY(nombre))");
             sqlite.execSQL("CREATE TABLE ventas (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, fecha INTEGER NOT NULL, "
                     + "total REAL NOT NULL, itemsJson TEXT, isSynced INTEGER NOT NULL"
-                    + (hasPayment ? ", metodoPago TEXT DEFAULT 'Efectivo'" : "") + ")");
+                    + (hasPayment ? ", metodoPago TEXT DEFAULT 'Efectivo'" : "")
+                    + (hasUuid ? ", uuid TEXT" : "") + ")");
             if (hasIndices) {
                 sqlite.execSQL("CREATE INDEX `index_ventas_fecha` ON `ventas` (`fecha`)");
                 sqlite.execSQL("CREATE INDEX `index_ventas_isSynced` ON `ventas` (`isSynced`)");

@@ -102,6 +102,7 @@ public final class CatalogSync {
             }
             if (previous != null) {
                 p.stock = previous.stock;
+                p.gastosAnadidos = previous.gastosAnadidos;
                 if ("UD".equals(p.unidadMedida) && previous.unidadMedida != null) {
                     p.unidadMedida = previous.unidadMedida;
                 }

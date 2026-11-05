@@ -7,6 +7,7 @@ erDiagram
         list ingredientes
         string unidadMedida
         int stock "-1 = sin control"
+        double gastosAnadidos "por unidad; v7"
     }
     ExtraLocal { string nombre PK
         double precio }
@@ -20,3 +21,26 @@ erDiagram
         string metodoPago
         string uuid "añadido en la migración 5 a 6"
     }
+    IngredienteLocal {
+        long id PK
+        string nombre
+        string nombreNormalizado UK
+        string unidad "G, ML o UD"
+        double stock "null = sin control; puede ser negativo"
+        double precioCompra "€/kg, €/L o €/ud"
+    }
+    RecetaLineaLocal {
+        long id PK
+        int productoCodigo "sin FK a productos"
+        long ingredienteId FK
+        double cantidad
+        string nombreEnCarta
+    }
+    ExtraConsumoLocal {
+        long id PK
+        string extraNormalizado "sin FK a extras"
+        long ingredienteId FK
+        double cantidad
+    }
+    IngredienteLocal ||--o{ RecetaLineaLocal : "ON DELETE CASCADE"
+    IngredienteLocal ||--o{ ExtraConsumoLocal : "ON DELETE CASCADE"

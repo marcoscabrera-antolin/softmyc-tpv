@@ -25,6 +25,9 @@ public class TenantCatalogSeeder {
             "lanube", "elbocata", "fruteria", "taller", "paqueteria", "mayorista")));
     private static final String STATE_TABLE = "catalog_state";
     private static final String SEEDED_KEY = "catalogo_sembrado";
+    /** Marca aparte: las bases ya sembradas antes del escandallo también lo reciben, una sola vez. */
+    private static final String ESCANDALLO_KEY = "escandallo_sembrado";
+    static final String ESCANDALLO_LANUBE = "escandallo_lanube.csv";
     private static final String CREATE_STATE_TABLE_SQL =
             "CREATE TABLE IF NOT EXISTS " + STATE_TABLE + " (clave TEXT NOT NULL PRIMARY KEY, valor TEXT)";
 
@@ -123,13 +126,14 @@ public class TenantCatalogSeeder {
             ensureStateTable(db);
             // Todo en una transacción: o queda el catálogo completo y marcado, o nada.
             db.runInTransaction(() -> {
-                if (isMarkedSeeded(db)) return;
+                if (isMarked(db, SEEDED_KEY)) return;
                 if (db.productoDao().getAll().isEmpty()) {
                     Log.i(TAG, "🌱 Inicializando catálogo inicial para tenant: " + safeTenant);
                     seedCatalog(context, db, safeTenant);
                 }
-                markSeeded(db);
+                mark(db, SEEDED_KEY);
             });
+            if ("lanube".equals(safeTenant)) seedEscandallo(context, db);
             return true;
         } catch (Exception e) {
             Log.e(TAG, "Error poblando catálogo inicial para " + safeTenant, e);
@@ -165,16 +169,34 @@ public class TenantCatalogSeeder {
         db.getOpenHelper().getWritableDatabase().execSQL(CREATE_STATE_TABLE_SQL);
     }
 
-    private static boolean isMarkedSeeded(AppDatabase db) {
+    private static boolean isMarked(AppDatabase db, String clave) {
         try (android.database.Cursor cursor = db.getOpenHelper().getReadableDatabase()
-                .query("SELECT 1 FROM " + STATE_TABLE + " WHERE clave = ?", new Object[]{SEEDED_KEY})) {
+                .query("SELECT 1 FROM " + STATE_TABLE + " WHERE clave = ?", new Object[]{clave})) {
             return cursor.moveToFirst();
         }
     }
 
-    private static void markSeeded(AppDatabase db) {
+    private static void mark(AppDatabase db, String clave) {
         db.getOpenHelper().getWritableDatabase()
-                .execSQL("INSERT OR REPLACE INTO " + STATE_TABLE + " (clave, valor) VALUES (?, ?)", new Object[]{SEEDED_KEY, "1"});
+                .execSQL("INSERT OR REPLACE INTO " + STATE_TABLE + " (clave, valor) VALUES (?, ?)", new Object[]{clave, "1"});
+    }
+
+    /**
+     * Carga el escandallo de La Nube una sola vez y solo si no hay ingredientes (nunca pisa lo que el encargado
+     * haya creado). Un fallo no impide usar la app: se registra y se reintenta en el siguiente arranque.
+     */
+    static void seedEscandallo(Context context, AppDatabase db) {
+        if (isMarked(db, ESCANDALLO_KEY)) return;
+        try (InputStream is = context.getAssets().open(ESCANDALLO_LANUBE)) {
+            if (db.escandalloDao().contarIngredientes() == 0) {
+                com.softmyc.tpv.domain.escandallo.InformeImportacion informe = EscandalloCsvImporter.importar(db, is);
+                Log.i(TAG, "Escandallo cargado: " + informe.ingredientes + " ingredientes, "
+                        + informe.productosConReceta + " recetas, " + informe.rechazadas.size() + " filas rechazadas");
+            }
+            mark(db, ESCANDALLO_KEY);
+        } catch (Exception e) {
+            Log.e(TAG, "No se pudo cargar el escandallo inicial", e);
+        }
     }
 
     /** Lanza si falta un CSV: el seeder completo se revierte en lugar de dejar un catálogo parcial. */

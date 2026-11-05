@@ -16,6 +16,12 @@ import com.softmyc.tpv.domain.PedidoItem;
 import com.softmyc.tpv.domain.Producto;
 import com.softmyc.tpv.domain.usecase.AgregarItemAlPedidoUseCase;
 import com.softmyc.tpv.domain.usecase.BuscadorProductos;
+import com.softmyc.tpv.domain.usecase.AvisoIngredientes;
+import com.softmyc.tpv.domain.usecase.ConsumoIngredientes;
+import com.softmyc.tpv.domain.escandallo.LineaConsumo;
+import com.softmyc.tpv.domain.escandallo.Recetario;
+import com.softmyc.tpv.domain.repository.EscandalloRepository;
+import com.softmyc.tpv.composicion.Dependencias;
 import com.softmyc.tpv.domain.usecase.CalcularTotalUseCase;
 import com.softmyc.tpv.data.repo.ImpresionVentaFactory;
 import com.softmyc.tpv.data.sync.SincronizacionServidor;
@@ -189,7 +195,37 @@ public class PedidoViewModel extends AndroidViewModel {
             } catch (Exception e) {
                 _toastMessage.postValue(textos.cadena(R.string.pedido_error_bd_local));
             }
+            cargarRecetario();
         });
+    }
+
+    /** Vuelve a leer el escandallo (stock de ingredientes) en segundo plano. */
+    public void refrescarEscandallo() {
+        diskExecutor.execute(this::cargarRecetario);
+    }
+
+    private void cargarRecetario() {
+        try {
+            EscandalloRepository repo = Dependencias.escandallo(getApplication());
+            recetario = repo.recetario();
+        } catch (Exception e) {
+            // Sin escandallo no hay avisos de ingredientes; la venta funciona igual.
+            android.util.Log.w("PedidoViewModel", "No se pudo leer el escandallo", e);
+        }
+    }
+
+    /**
+     * NEG-12: texto de aviso si los ingredientes no llegan para el pedido actual más {@code nuevo}; vacío si
+     * llegan. Solo avisa: la venta nunca se bloquea.
+     */
+    public String avisoIngredientes(PedidoItem nuevo) {
+        List<LineaConsumo> lineas = new ArrayList<>();
+        List<PedidoItem> actual = _pedido.getValue();
+        if (actual != null) for (PedidoItem p : actual) lineas.add(LineaConsumo.de(p));
+        if (nuevo != null) lineas.add(LineaConsumo.de(nuevo));
+        Recetario r = recetario;
+        return AvisoIngredientes.resumen(
+                AvisoIngredientes.evaluar(ConsumoIngredientes.calcular(lineas, r), r.ingredientes()), 2);
     }
 
     private void aplicarCatalogo(CatalogoLocal.Cargado c) {
@@ -411,6 +447,9 @@ public class PedidoViewModel extends AndroidViewModel {
 
     // Stock por código del catálogo cargado desde Room (-1 = sin control). Se reemplaza entero al recargar.
     private volatile Map<Integer, Integer> stockPorCodigo = new HashMap<>();
+
+    /** Escandallo para avisar de ingredientes que no llegan; se refresca al cargar y tras cada venta. */
+    private volatile Recetario recetario = Recetario.VACIO;
 
     // Filtros activos de la cuadrícula: se reaplican si el catálogo se recarga mientras se busca.
     private volatile String categoriaActual;

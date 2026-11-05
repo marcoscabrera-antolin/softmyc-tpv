@@ -1,11 +1,10 @@
 package com.softmyc.tpv.domain.usecase;
 
+import com.softmyc.tpv.domain.NombreNormalizado;
 import com.softmyc.tpv.domain.Producto;
 
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Búsqueda de productos en la pantalla de pedido.
@@ -63,8 +62,6 @@ public final class BuscadorProductos {
 
     /** Minúsculas, sin acentos y sin espacios sobrantes. */
     static String normalizar(String s) {
-        if (s == null) return "";
-        String sinAcentos = Normalizer.normalize(s, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
-        return sinAcentos.toLowerCase(Locale.ROOT).trim().replaceAll("\\s+", " ");
+        return NombreNormalizado.de(s);
     }
 }

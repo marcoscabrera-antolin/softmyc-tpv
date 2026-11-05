@@ -82,6 +82,28 @@ public class ArquitecturaCapasTest {
         assertTrue(ficherosQueImportan("domain", "com.softmyc.tpv.presentation.").isEmpty());
     }
 
+    /**
+     * La raíz de composición es el único sitio fuera de data que elige implementaciones de data: sus métodos
+     * públicos solo pueden devolver tipos de domain (o nada), para que presentation no reciba clases de data.
+     */
+    @Test
+    public void composicion_soloEntregaTiposDeDominio() throws IOException {
+        Pattern firma = Pattern.compile("public\\s+static\\s+([\\w.<>]+)\\s+\\w+\\s*\\(");
+        try (Stream<Path> paseo = Files.walk(RAIZ.resolve("composicion"))) {
+            for (Path f : (Iterable<Path>) paseo.filter(p -> p.toString().endsWith(".java"))::iterator) {
+                String codigo = new String(Files.readAllBytes(f), StandardCharsets.UTF_8);
+                java.util.regex.Matcher m = firma.matcher(codigo);
+                while (m.find()) {
+                    String tipo = m.group(1);
+                    if (tipo.equals("void")) continue;
+                    assertTrue(f + " devuelve " + tipo + ", que no es de domain",
+                            Pattern.compile("^import\\s+com\\.softmyc\\.tpv\\.domain\\.[\\w.]*\\b" + Pattern.quote(tipo) + ";",
+                                    Pattern.MULTILINE).matcher(codigo).find());
+                }
+            }
+        }
+    }
+
     @Test
     public void domain_noDependeDeAndroid() throws IOException {
         Set<String> conAndroid = ficherosQueImportan("domain", "android.");

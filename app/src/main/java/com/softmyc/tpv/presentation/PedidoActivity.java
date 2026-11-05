@@ -267,10 +267,21 @@ public class PedidoActivity extends BaseActivity {
         // Lo que ya hay en el pedido más lo que se añade, y solo para líneas en unidades (las de peso/horas no descuentan stock).
         int enPedido = StockAdvisor.cantidadUdEnPedido(viewModel.pedido.getValue(), codigo);
         StockAdvisor.Aviso aviso = StockAdvisor.evaluar(stock, customItem.getUnit(), enPedido + customItem.getQuantity());
+        StringBuilder texto = new StringBuilder();
         if (aviso.superaStock()) {
-            Snackbar.make(findViewById(android.R.id.content),
-                    getString(R.string.pedido_aviso_stock_fmt, customItem.getBaseProduct().getNombre(), aviso.mensaje()),
-                    Snackbar.LENGTH_LONG).show();
+            texto.append(getString(R.string.pedido_aviso_stock_fmt, customItem.getBaseProduct().getNombre(), aviso.mensaje()));
+        }
+        // Escandallo: ingredientes que no llegan para el pedido (NEG-12, solo aviso).
+        String ingredientes = viewModel.avisoIngredientes(customItem.toPedidoItem());
+        if (!ingredientes.isEmpty()) {
+            if (texto.length() > 0) texto.append('\n');
+            texto.append(getString(R.string.pedido_aviso_ingredientes_fmt, ingredientes));
+        }
+        if (texto.length() > 0) {
+            Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), texto.toString(), Snackbar.LENGTH_LONG);
+            TextView t = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+            if (t != null) t.setMaxLines(5);
+            snackbar.show();
         }
     }
 
@@ -347,6 +358,8 @@ public class PedidoActivity extends BaseActivity {
                 lista, item -> viewModel.calcularExtras(item)
         );
         listaPedido.setAdapter(new PedidoAdapter(this, data.detalles, data.totales));
+        // Pedido vacío = recién cobrado (o vaciado): el stock de ingredientes ha cambiado, se vuelve a leer.
+        if (lista == null || lista.isEmpty()) viewModel.refrescarEscandallo();
     }
 
     private void mostrarOpcionesEdicion(int position) {
