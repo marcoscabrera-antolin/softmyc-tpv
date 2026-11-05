@@ -74,7 +74,7 @@ app/release/
 
 # Datos locales y caché generada
 local.properties
-package-lock.json
+# package-lock.json NO se ignora: la CI (npm ci) y el Dockerfile de la API lo necesitan.
 graphify-out/
 
 # ─── Copias de seguridad de la base (tfg-db) ─────────
