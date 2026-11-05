@@ -28,6 +28,8 @@ public class TenantCatalogSeeder {
     /** Marca aparte: las bases ya sembradas antes del escandallo también lo reciben, una sola vez. */
     private static final String ESCANDALLO_KEY = "escandallo_sembrado";
     static final String ESCANDALLO_LANUBE = "escandallo_lanube.csv";
+    /** Precios de carta del documento de costes, aplicados una vez a las bases ya sembradas. */
+    private static final String PRECIOS_KEY = "precios_carta_2026_11";
     private static final String CREATE_STATE_TABLE_SQL =
             "CREATE TABLE IF NOT EXISTS " + STATE_TABLE + " (clave TEXT NOT NULL PRIMARY KEY, valor TEXT)";
 
@@ -133,7 +135,10 @@ public class TenantCatalogSeeder {
                 }
                 mark(db, SEEDED_KEY);
             });
-            if ("lanube".equals(safeTenant)) seedEscandallo(context, db);
+            if ("lanube".equals(safeTenant)) {
+                seedEscandallo(context, db);
+                actualizarPrecios(context, db);
+            }
             return true;
         } catch (Exception e) {
             Log.e(TAG, "Error poblando catálogo inicial para " + safeTenant, e);
@@ -179,6 +184,18 @@ public class TenantCatalogSeeder {
     private static void mark(AppDatabase db, String clave) {
         db.getOpenHelper().getWritableDatabase()
                 .execSQL("INSERT OR REPLACE INTO " + STATE_TABLE + " (clave, valor) VALUES (?, ?)", new Object[]{clave, "1"});
+    }
+
+    static void actualizarPrecios(Context context, AppDatabase db) {
+        try {
+            db.runInTransaction(() -> {
+                if (isMarked(db, PRECIOS_KEY)) return;
+                PreciosCartaLaNube.aplicar(context, db, "lanube");
+                mark(db, PRECIOS_KEY);
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "No se pudieron actualizar los precios de la carta", e);
+        }
     }
 
     /**

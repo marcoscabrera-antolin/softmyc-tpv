@@ -44,6 +44,10 @@ public interface ProductoDao {
     @Query("UPDATE productos SET stock = :stock WHERE codigo = :codigo")
     int setStock(int codigo, int stock);
 
+    /** Cambia el precio solo si sigue siendo {@code anterior} (no pisa un precio editado a mano). */
+    @Query("UPDATE productos SET precio = :nuevo WHERE codigo = :codigo AND ABS(precio - :anterior) < 0.001")
+    int actualizarPrecioSiEs(int codigo, double anterior, double nuevo);
+
     @Query("UPDATE productos SET gastosAnadidos = :gastos WHERE codigo = :codigo")
     int setGastosAnadidos(int codigo, Double gastos);
 

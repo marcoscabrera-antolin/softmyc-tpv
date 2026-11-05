@@ -173,6 +173,39 @@ public class EscandalloLanubeTest {
     }
 
     @Test
+    public void la_carta_trae_los_precios_del_documento_de_costes() {
+        for (double[] p : PreciosCartaLaNube.PRECIOS) {
+            assertEquals("Producto " + (int) p[0], p[2], db.productoDao().getByCodigo((int) p[0]).precio, 1e-9);
+        }
+        assertEquals(42, PreciosCartaLaNube.PRECIOS.length);
+    }
+
+    @Test
+    public void una_base_antigua_recibe_los_precios_nuevos_sin_pisar_los_editados_y_los_encola() {
+        android.content.SharedPreferences prefs = com.softmyc.tpv.data.SecurePreferencesHelper.getPrinterPrefs(context);
+        prefs.edit().clear().commit();
+        db.productoDao().deleteAll();
+        db.productoDao().insert(new ProductoLocal(1, "NUBE", 4.00, "Bocadillos", new java.util.ArrayList<>()));
+        db.productoDao().insert(new ProductoLocal(3, "MICKEY", 9.99, "Bocadillos", new java.util.ArrayList<>()));
+        db.productoDao().insert(new ProductoLocal(9, "TIGGER", 4.50, "Bocadillos", new java.util.ArrayList<>()));
+        com.softmyc.tpv.data.sync.CatalogOutbox cola = new com.softmyc.tpv.data.sync.CatalogOutbox(prefs);
+
+        assertTrue(TenantCatalogSeeder.seedTenantSync(context, db, "lanube"));
+
+        assertEquals(7.25, db.productoDao().getByCodigo(1).precio, 1e-9);
+        assertEquals("editado a mano: se respeta", 9.99, db.productoDao().getByCodigo(3).precio, 1e-9);
+        assertEquals("fuera del documento: no cambia", 4.50, db.productoDao().getByCodigo(9).precio, 1e-9);
+        assertEquals(1, cola.pending("lanube").size());
+        assertEquals(1, cola.pending("lanube").get(0).codigo);
+
+        // Una sola vez: si después se vuelve a poner 4,00 a mano, no se cambia otra vez.
+        db.productoDao().actualizarPrecioSiEs(1, 7.25, 4.00);
+        assertTrue(TenantCatalogSeeder.seedTenantSync(context, db, "lanube"));
+        assertEquals(4.00, db.productoDao().getByCodigo(1).precio, 1e-9);
+        prefs.edit().clear().commit();
+    }
+
+    @Test
     public void otros_negocios_no_reciben_el_escandallo_de_la_nube() {
         assertTrue(TenantCatalogSeeder.seedTenantSync(context, db, "fruteria"));
         assertEquals(0, db.escandalloDao().contarIngredientes());
