@@ -23,8 +23,6 @@
     <string name="atras">Back</string>
     <string name="bocadillos">Sandwiches</string>
     <string name="bocateria_gourmet">🥪 Gourmet sandwich shop</string>
-    <string name="buscar_o_introducir_id">Search or enter ID...</string>
-    <string name="buscar_o_introducir_id_rapido">Search or enter quick ID...</string>
     <string name="buscar_por_producto">Search by product...</string>
     <string name="buscar_producto">SEARCH PRODUCT</string>
     <string name="buscar_producto_o_codigo">Search product or code</string>
@@ -135,7 +133,6 @@
     <string name="iniciando_importacion_n">Starting import...\n</string>
     <string name="iniciando_sistema">STARTING SYSTEM...</string>
     <string name="iniciar_sesion">SIGN IN</string>
-    <string name="introduce_el_id_del_producto">Enter the product ID</string>
     <string name="introduce_id_ej_25">Enter ID (e.g. 25)</string>
     <string name="introduce_numero_de_ticket">Enter receipt number...</string>
     <string name="la_direccion_ip_o_el_nombre_de_host_no_e">The IP address or host name is not valid</string>
@@ -415,4 +412,7 @@
         <item quantity="one">Live Monitor • %1$d active order</item>
         <item quantity="other">Live Monitor • %1$d active orders</item>
     </plurals>
+    <string name="buscar_nombre_ingrediente_o_id">Search by name, ingredient or ID…</string>
+    <string name="limpiar_busqueda">Clear search</string>
+    <string name="pedido_busqueda_sin_resultados">No matching products</string>
 </resources>

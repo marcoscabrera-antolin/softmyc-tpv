@@ -86,47 +86,45 @@
             app:cardBackgroundColor="#1E293B">
 
             <LinearLayout
-                android:id="@+id/btnIntroducirID"
+                android:id="@+id/contenedorBuscador"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
-                android:paddingHorizontal="14dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground">
-                
+                android:paddingStart="14dp"
+                android:paddingEnd="4dp">
+
                 <ImageView
-                    android:contentDescription="@null"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@android:drawable/ic_menu_search"
+                    android:importantForAccessibility="no"
                     app:tint="#64748B"/>
 
-                <LinearLayout
+                <EditText
+                    android:id="@+id/edtBuscarProducto"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="12dp">
-                    <TextView
-                        android:id="@+id/txtTituloID"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/buscar_o_introducir_id"
-                        android:textColor="#E2E8F0"
-                        android:textSize="15sp"
-                        android:textStyle="bold"/>
-                     <TextView
-                        android:id="@+id/txtProductoSeleccionado"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:visibility="gone"
-                        android:textColor="#94A3B8"
-                        android:textSize="12sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"/>
-                </LinearLayout>
+                    android:layout_marginStart="12dp"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/buscar_nombre_ingrediente_o_id"
+                    android:textColorHint="#64748B"
+                    android:textColor="#E2E8F0"
+                    android:textSize="15sp"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch|flagNoExtractUi"
+                    android:maxLines="1"
+                    android:importantForAutofill="no"/>
+
+                <ImageButton
+                    android:id="@+id/btnLimpiarBusqueda"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    android:contentDescription="@string/limpiar_busqueda"
+                    android:visibility="gone"
+                    app:tint="#94A3B8"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

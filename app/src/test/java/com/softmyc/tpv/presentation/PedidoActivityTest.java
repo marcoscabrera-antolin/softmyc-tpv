@@ -186,21 +186,44 @@ public class PedidoActivityTest {
     }
 
     @Test
-    public void introducir_un_id_inexistente_avisa_y_uno_valido_lo_selecciona() {
-        introducirId("999");
-        assertEquals("ID 999 no encontrado", ShadowToast.getTextOfLatestToast());
+    public void el_buscador_filtra_la_carta_por_nombre_sin_acentos_y_por_id() {
+        buscar("cafe");
+        assertEquals(1, vm.productosFiltrados.getValue().size());
+        assertEquals("Café", vm.productosFiltrados.getValue().get(0).getNombre());
 
-        introducirId("1");
-        assertEquals("Seleccionado: Café", ShadowToast.getTextOfLatestToast());
+        buscar("2");
+        assertEquals("Tarta", vm.productosFiltrados.getValue().get(0).getNombre());
+
+        buscar("");
+        assertEquals(2, vm.productosFiltrados.getValue().size());
     }
 
     @Test
-    public void introducir_un_id_vacio_no_hace_nada() {
-        ShadowToast.reset();
+    public void la_x_borra_la_busqueda_y_solo_se_ve_con_texto() {
+        View limpiar = controlador.get().findViewById(R.id.btnLimpiarBusqueda);
+        assertEquals(View.GONE, limpiar.getVisibility());
 
-        introducirId("");
+        buscar("tar");
+        assertEquals(View.VISIBLE, limpiar.getVisibility());
 
-        assertEquals(0, ShadowToast.shownToastCount());
+        limpiar.performClick();
+        ShadowLooper.idleMainLooper();
+        assertEquals("", campoBusqueda().getText().toString());
+        assertEquals(2, vm.productosFiltrados.getValue().size());
+        assertEquals(View.GONE, limpiar.getVisibility());
+    }
+
+    @Test
+    public void buscar_con_un_unico_resultado_abre_el_producto_y_sin_resultados_avisa() {
+        buscar("zzz");
+        campoBusqueda().onEditorAction(android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH);
+        ShadowLooper.idleMainLooper();
+        assertEquals("No hay productos que coincidan", ShadowToast.getTextOfLatestToast());
+
+        buscar("1");
+        campoBusqueda().onEditorAction(android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH);
+        ShadowLooper.idleMainLooper();
+        assertNotNull(controlador.get().getSupportFragmentManager().findFragmentByTag("PersonalizarProducto"));
     }
 
     @Test
@@ -310,11 +333,12 @@ public class PedidoActivityTest {
         ShadowLooper.idleMainLooper();
     }
 
-    private void introducirId(String texto) {
-        controlador.get().findViewById(R.id.btnIntroducirID).performClick();
-        android.app.AlertDialog dialogo = (android.app.AlertDialog) ShadowDialog.getLatestDialog();
-        primerEditText(dialogo).setText(texto);
-        dialogo.getButton(android.app.AlertDialog.BUTTON_POSITIVE).performClick();
+    private EditText campoBusqueda() {
+        return controlador.get().findViewById(R.id.edtBuscarProducto);
+    }
+
+    private void buscar(String texto) {
+        campoBusqueda().setText(texto);
         ShadowLooper.idleMainLooper();
     }
 

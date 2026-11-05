@@ -285,6 +285,25 @@ public class PedidoViewModelTest {
     }
 
     @Test
+    public void buscar_filtra_por_nombre_y_vacio_vuelve_a_mostrar_todo() {
+        vm.buscar("tarta");
+        assertEquals(Collections.singletonList(3), codigos(vm.productosFiltrados.getValue()));
+
+        vm.buscar("");
+        assertEquals(3, vm.productosFiltrados.getValue().size());
+    }
+
+    @Test
+    public void buscar_se_combina_con_la_categoria_seleccionada() {
+        vm.filterByCategory("postres");
+        vm.buscar("cafe");
+        assertTrue(vm.productosFiltrados.getValue().isEmpty());
+
+        vm.filterByCategory("TODOS");
+        assertEquals(Collections.singletonList(1), codigos(vm.productosFiltrados.getValue()));
+    }
+
+    @Test
     public void vaciarPedido_limpia_lineas_total_hora_y_venta_recuperada() {
         vm.setPedidoDirectamente(new ArrayList<>(Collections.singletonList(itemTarta(2))));
         vm.actualizarHoraRecogida("13:30");

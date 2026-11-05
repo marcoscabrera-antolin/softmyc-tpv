@@ -15,6 +15,7 @@ import com.softmyc.tpv.domain.CustomizedOrderItem;
 import com.softmyc.tpv.domain.PedidoItem;
 import com.softmyc.tpv.domain.Producto;
 import com.softmyc.tpv.domain.usecase.AgregarItemAlPedidoUseCase;
+import com.softmyc.tpv.domain.usecase.BuscadorProductos;
 import com.softmyc.tpv.domain.usecase.CalcularTotalUseCase;
 import com.softmyc.tpv.data.repo.ImpresionVentaFactory;
 import com.softmyc.tpv.data.sync.SincronizacionServidor;
@@ -195,7 +196,8 @@ public class PedidoViewModel extends AndroidViewModel {
         stockPorCodigo = c.stockPorCodigo();
         _productosDisponibles.postValue(c.productos());
         _categorias.postValue(c.categorias());
-        _productosFiltrados.postValue(c.productos());
+        boolean sinFiltros = categoriaActual == null && textoBusqueda.isEmpty();
+        _productosFiltrados.postValue(sinFiltros ? c.productos() : calcularFiltrados(c.productos()));
         _ingredientesDisponibles.postValue(c.nombresExtras());
         _preciosIngredientes.postValue(c.preciosExtras());
         _salsasDisponibles.postValue(c.salsas());
@@ -274,12 +276,28 @@ public class PedidoViewModel extends AndroidViewModel {
     }
 
     public void filterByCategory(String categoryName) {
+        categoriaActual = categoryName;
+        aplicarFiltros();
+    }
+
+    /** Filtra la cuadrícula por nombre, ingrediente o código, combinado con la categoría seleccionada. */
+    public void buscar(String texto) {
+        textoBusqueda = texto != null ? texto : "";
+        aplicarFiltros();
+    }
+
+    private void aplicarFiltros() {
         List<Producto> disponibles = _productosDisponibles.getValue();
         if (disponibles == null) return;
+        _productosFiltrados.setValue(calcularFiltrados(disponibles));
+    }
 
+    private List<Producto> calcularFiltrados(List<Producto> disponibles) {
         List<Producto> filtrados = new ArrayList<>();
+        if (disponibles == null) return filtrados;
+        String categoryName = categoriaActual;
 
-        if (categoryName == null || categoryName.equalsIgnoreCase("TODOS") || categoryName.equalsIgnoreCase("Todos")) {
+        if (categoryName == null || categoryName.equalsIgnoreCase("TODOS")) {
             filtrados.addAll(disponibles);
         } else {
             String normTarget = com.softmyc.tpv.util.CategoryUtils.capitalizeCategory(categoryName);
@@ -293,8 +311,9 @@ public class PedidoViewModel extends AndroidViewModel {
             }
         }
 
+        filtrados = BuscadorProductos.filtrar(filtrados, textoBusqueda);
         Collections.sort(filtrados, (a, b) -> Integer.compare(a.getCodigo(), b.getCodigo()));
-        _productosFiltrados.setValue(filtrados);
+        return filtrados;
     }
 
     public void agregarCustomizedItem(CustomizedOrderItem customItem) {
@@ -392,6 +411,10 @@ public class PedidoViewModel extends AndroidViewModel {
 
     // Stock por código del catálogo cargado desde Room (-1 = sin control). Se reemplaza entero al recargar.
     private volatile Map<Integer, Integer> stockPorCodigo = new HashMap<>();
+
+    // Filtros activos de la cuadrícula: se reaplican si el catálogo se recarga mientras se busca.
+    private volatile String categoriaActual;
+    private volatile String textoBusqueda = "";
 
     /** Delega en {@link CobroVenta}: el ViewModel no sabe de impresoras ni de Room. */
     public void imprimirYGuardarVenta(Context context, String nombreTienda, String metodoPago) {

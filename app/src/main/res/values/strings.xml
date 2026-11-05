@@ -23,8 +23,6 @@
     <string name="atras">Atrás</string>
     <string name="bocadillos">Bocadillos</string>
     <string name="bocateria_gourmet">🥪 Bocatería Gourmet</string>
-    <string name="buscar_o_introducir_id">Buscar o introducir ID...</string>
-    <string name="buscar_o_introducir_id_rapido">Buscar o introducir ID rápido...</string>
     <string name="buscar_por_producto">Buscar por producto...</string>
     <string name="buscar_producto">BUSCAR PRODUCTO</string>
     <string name="buscar_producto_o_codigo">Buscar producto o código</string>
@@ -135,7 +133,6 @@
     <string name="iniciando_importacion_n">Iniciando importación...\n</string>
     <string name="iniciando_sistema">INICIANDO SISTEMA...</string>
     <string name="iniciar_sesion">INICIAR SESIÓN</string>
-    <string name="introduce_el_id_del_producto">Introduce el ID del producto</string>
     <string name="introduce_id_ej_25">Introduce ID (Ej: 25)</string>
     <string name="introduce_numero_de_ticket">Introduce número de ticket...</string>
     <string name="la_direccion_ip_o_el_nombre_de_host_no_e">La dirección IP o el nombre de host no es válido</string>
@@ -415,4 +412,7 @@
         <item quantity="one">Monitor en Vivo • %1$d pedido activo</item>
         <item quantity="other">Monitor en Vivo • %1$d pedidos activos</item>
     </plurals>
+    <string name="buscar_nombre_ingrediente_o_id">Buscar por nombre, ingrediente o ID…</string>
+    <string name="limpiar_busqueda">Borrar búsqueda</string>
+    <string name="pedido_busqueda_sin_resultados">No hay productos que coincidan</string>
 </resources>

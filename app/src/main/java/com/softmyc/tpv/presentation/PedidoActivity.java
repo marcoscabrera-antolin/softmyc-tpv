@@ -36,14 +36,18 @@ public class PedidoActivity extends BaseActivity {
     private CategoriaAdapter categoryAdapter;
     private ProductoGridAdapter productAdapter;
 
-    private LinearLayout btnIntroducirID, btnImprimir, btnHora;
+    private LinearLayout btnImprimir, btnHora;
+
+    // ----------- BUSCADOR (nombre, ingrediente o ID) ----------
+    private EditText edtBuscarProducto;
+    private ImageButton btnLimpiarBusqueda;
     private View btnRecuperarPedido, btnVaciarPedido;
 
     // Diálogo de fallo de impresión abierto (evita apilar varios si llega otro fallo).
     private androidx.appcompat.app.AlertDialog dialogoFalloImpresion;
 
     // ----------- TEXTOS DINÁMICOS ----------
-    private TextView txtProductoSeleccionado, textoTotal, txtHoraRecogida, txtTituloID;
+    private TextView textoTotal, txtHoraRecogida;
 
     // ----------- PEDIDO ------------------
     private ListView listaPedido;
@@ -68,9 +72,8 @@ public class PedidoActivity extends BaseActivity {
         recyclerCategorias = findViewById(R.id.recyclerCategorias);
         recyclerProductosGrid = findViewById(R.id.recyclerProductosGrid);
 
-        btnIntroducirID = findViewById(R.id.btnIntroducirID);
-        txtTituloID = findViewById(R.id.txtTituloID);
-        txtProductoSeleccionado = findViewById(R.id.txtProductoSeleccionado);
+        edtBuscarProducto = findViewById(R.id.edtBuscarProducto);
+        btnLimpiarBusqueda = findViewById(R.id.btnLimpiarBusqueda);
         
         listaPedido = findViewById(R.id.listaPedido);
         textoTotal = findViewById(R.id.textoTotal);
@@ -98,7 +101,7 @@ public class PedidoActivity extends BaseActivity {
     }
 
     private void configurarBotones() {
-        if (btnIntroducirID != null) btnIntroducirID.setOnClickListener(v -> pedirIDProducto());
+        configurarBuscador();
         btnHora.setOnClickListener(v -> pedirHora());
         btnImprimir.setOnClickListener(v -> seleccionarMetodoPagoYProcesar());
         if (btnRecuperarPedido != null) {
@@ -294,25 +297,49 @@ public class PedidoActivity extends BaseActivity {
                 .show();
     }
 
-    private void pedirIDProducto() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.introduce_el_id_del_producto));
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        builder.setView(input);
-
-        builder.setPositiveButton(getString(R.string.aceptar), (dialog, which) -> {
-            String texto = input.getText().toString();
-            if (texto.isEmpty()) return;
-            try {
-                int id = Integer.parseInt(texto);
-                viewModel.seleccionarProductoPorId(id);
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, getString(R.string.codigo_invalido), Toast.LENGTH_SHORT).show();
+    /**
+     * Buscador de la cuadrícula: filtra mientras se escribe por nombre, ingrediente o código. Al pulsar
+     * "Buscar" en el teclado, si solo queda un producto se abre directamente (sustituye al antiguo ID rápido).
+     */
+    private void configurarBuscador() {
+        if (edtBuscarProducto == null) return;
+        edtBuscarProducto.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override public void afterTextChanged(android.text.Editable s) {
+                String texto = s.toString();
+                if (btnLimpiarBusqueda != null) {
+                    btnLimpiarBusqueda.setVisibility(texto.isEmpty() ? View.GONE : View.VISIBLE);
+                }
+                if (viewModel != null) viewModel.buscar(texto);
             }
         });
-        builder.setNegativeButton(getString(R.string.cancelar), null);
-        builder.show();
+        edtBuscarProducto.setOnEditorActionListener((v, actionId, event) -> {
+            boolean esBuscar = actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
+                    || (event != null && event.getKeyCode() == android.view.KeyEvent.KEYCODE_ENTER
+                        && event.getAction() == android.view.KeyEvent.ACTION_DOWN);
+            if (!esBuscar) return false;
+            ocultarTeclado();
+            List<Producto> resultados = viewModel != null ? viewModel.productosFiltrados.getValue() : null;
+            if (resultados != null && resultados.size() == 1) {
+                abrirModalPersonalizacion(resultados.get(0));
+            } else if (resultados != null && resultados.isEmpty()) {
+                Toast.makeText(this, getString(R.string.pedido_busqueda_sin_resultados), Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        });
+        if (btnLimpiarBusqueda != null) {
+            btnLimpiarBusqueda.setOnClickListener(v -> edtBuscarProducto.setText(""));
+        }
+    }
+
+    private void ocultarTeclado() {
+        android.view.inputmethod.InputMethodManager imm =
+                (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null && edtBuscarProducto != null) {
+            imm.hideSoftInputFromWindow(edtBuscarProducto.getWindowToken(), 0);
+        }
+        if (edtBuscarProducto != null) edtBuscarProducto.clearFocus();
     }
 
     private void actualizarLista(List<PedidoItem> lista) {
